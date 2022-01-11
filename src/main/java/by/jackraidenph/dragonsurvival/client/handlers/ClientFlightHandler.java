@@ -213,6 +213,7 @@ public class ClientFlightHandler {
     }
     
     public static boolean wasGliding = false;
+    public static boolean wasFlying = false;
     
     /**
      * Controls acceleration
@@ -260,8 +261,16 @@ public class ClientFlightHandler {
     
                         boolean hasFood = playerEntity.getFoodData().getFoodLevel() > ConfigHandler.SERVER.flightHungerThreshold.get() || playerEntity.isCreative() || ConfigHandler.SERVER.allowFlyingWithoutHunger.get();
                         
+                        if(!hasFood){
+                            ay = Math.abs(ay * 4);
+                        }
+                        
                         //start
                         if (ServerFlightHandler.isFlying(playerEntity)) {
+                            if(!wasFlying){
+                                wasFlying = true;
+                            }
+                            
                             Vector3d motion = playerEntity.getDeltaMovement();
                             
                             Vector3d lookVec = playerEntity.getLookAngle();
@@ -381,7 +390,7 @@ public class ClientFlightHandler {
     
                                 motion = motion.add(ax, ay, az);
     
-                                if(dragonStateHandler.getMovementData().bite){
+                                if(ServerFlightHandler.isSpin(playerEntity)){
                                     motion.multiply(10, 10, 10);
                                 }
     
@@ -408,7 +417,7 @@ public class ClientFlightHandler {
                                     return;
                                 }
                                 
-                                if(playerEntity.fallDistance >= 2.5) { //Dont activate on a regular jump
+                                if(wasFlying) { //Dont activate on a regular jump
                                     double yMotion = hasFood ? -g + ay : -(g * 4) + ay;
                                     motion = new Vector3d(motion.x, yMotion, motion.z);
                                     
@@ -421,6 +430,7 @@ public class ClientFlightHandler {
                             }
                         } else {
                             wasGliding = false;
+                            wasFlying = false;
                             ax = 0;
                             az = 0;
                             ay = 0;
@@ -438,24 +448,31 @@ public class ClientFlightHandler {
     private static long lastHungerMessage;
     
     @SubscribeEvent
+    public static void spin(InputEvent.RawMouseEvent keyInputEvent) {
+        ClientPlayerEntity player = Minecraft.getInstance().player;
+        if(player == null) return;
+        
+        DragonStateHandler handler = DragonStateProvider.getCap(player).orElse(null);
+        if(handler == null || !handler.isDragon()) return;
+        
+        if(KeyInputHandler.SPIN_ABILITY.getKey().getValue() == keyInputEvent.getButton()) {
+            spinKeybind(player, handler);
+        }
+    }
+    
+    @SubscribeEvent
     public static void toggleWings(InputEvent.KeyInputEvent keyInputEvent) {
         ClientPlayerEntity player = Minecraft.getInstance().player;
         if(player == null) return;
     
         DragonStateHandler handler = DragonStateProvider.getCap(player).orElse(null);
         if(handler == null || !handler.isDragon()) return;
-    
+        
         boolean currentState = handler.isWingsSpread();
         Vector3d lookVec = player.getLookAngle();
-        
-        if(Minecraft.getInstance().options.keyUse.isDown()) {
-            if (!ServerFlightHandler.isSpin(player) && handler.getMovementData().spinCooldown <= 0 && handler.getMovementData().spinLearned && player.isSprinting()) {
-                if(ServerFlightHandler.isFlying(player) || ServerFlightHandler.canSwimSpin(player)) {
-                    handler.getMovementData().spinAttack = ServerFlightHandler.spinDuration;
-                    handler.getMovementData().spinCooldown = ConfigHandler.SERVER.flightSpinCooldown.get() * 20;
-                    NetworkHandler.CHANNEL.sendToServer(new SyncSpinStatus(player.getId(), handler.getMovementData().spinAttack, handler.getMovementData().spinCooldown, handler.getMovementData().spinLearned));
-                }
-            }
+    
+        if(KeyInputHandler.SPIN_ABILITY.getKey().getValue() == keyInputEvent.getKey()) {
+            spinKeybind(player, handler);
         }
         
         if(ConfigHandler.CLIENT.jumpToFly.get() && !player.isCreative() && !player.isSpectator()) {
@@ -491,6 +508,17 @@ public class ClientFlightHandler {
                 }
             } else {
                 player.sendMessage(new TranslationTextComponent("ds.you.have.no.wings"), player.getUUID());
+            }
+        }
+    }
+    
+    private static void spinKeybind(ClientPlayerEntity player, DragonStateHandler handler)
+    {
+        if (!ServerFlightHandler.isSpin(player) && handler.getMovementData().spinCooldown <= 0 && handler.getMovementData().spinLearned) {
+            if (ServerFlightHandler.isFlying(player) || ServerFlightHandler.canSwimSpin(player)) {
+                handler.getMovementData().spinAttack = ServerFlightHandler.spinDuration;
+                handler.getMovementData().spinCooldown = ConfigHandler.SERVER.flightSpinCooldown.get() * 20;
+                NetworkHandler.CHANNEL.sendToServer(new SyncSpinStatus(player.getId(), handler.getMovementData().spinAttack, handler.getMovementData().spinCooldown, handler.getMovementData().spinLearned));
             }
         }
     }

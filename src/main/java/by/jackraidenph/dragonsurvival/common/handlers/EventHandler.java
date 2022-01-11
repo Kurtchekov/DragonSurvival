@@ -4,6 +4,7 @@ import by.jackraidenph.dragonsurvival.common.blocks.DSBlocks;
 import by.jackraidenph.dragonsurvival.common.DragonEffects;
 import by.jackraidenph.dragonsurvival.common.capability.DragonStateProvider;
 import by.jackraidenph.dragonsurvival.common.entity.DSEntities;
+import by.jackraidenph.dragonsurvival.common.handlers.magic.ClawToolHandler;
 import by.jackraidenph.dragonsurvival.config.ConfigHandler;
 import by.jackraidenph.dragonsurvival.common.entity.monsters.MagicalPredatorEntity;
 import by.jackraidenph.dragonsurvival.common.items.DSItems;
@@ -52,6 +53,7 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.SleepingLocationCheckEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.network.PacketDistributor;
@@ -150,6 +152,17 @@ public class EventHandler {
             sleepingLocationCheckEvent.setResult(Event.Result.ALLOW);
     }
     
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void expDrops(BlockEvent.BreakEvent breakEvent) {
+       if(DragonStateProvider.isDragon(breakEvent.getPlayer())){
+           if(breakEvent.getExpToDrop() > 0){
+               int bonusLevel = EnchantmentHelper.getEnchantmentLevel(Enchantments.BLOCK_FORTUNE, breakEvent.getPlayer());
+               int silklevel = EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH, breakEvent.getPlayer());
+               breakEvent.setExpToDrop(breakEvent.getState().getExpDrop(breakEvent.getWorld(), breakEvent.getPos(), bonusLevel, silklevel));
+           }
+       }
+    }
+    
     @SubscribeEvent
     public static void blockBroken(BlockEvent.BreakEvent breakEvent) {
         if(breakEvent.isCanceled()) return;
@@ -157,7 +170,7 @@ public class EventHandler {
         PlayerEntity playerEntity = breakEvent.getPlayer();
         if(playerEntity.isCreative()) return;
     
-        int i = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, playerEntity.getMainHandItem());
+        int i = EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH, playerEntity);
     
         if(i <= 0) {
             IWorld world = breakEvent.getWorld();
@@ -165,7 +178,7 @@ public class EventHandler {
                 BlockState blockState = breakEvent.getState();
                 BlockPos blockPos = breakEvent.getPos();
                 Block block = blockState.getBlock();
-                ItemStack mainHandItem = playerEntity.getMainHandItem();
+                ItemStack mainHandItem = ClawToolHandler.getDragonTools(playerEntity);
                 double random;
                 // Modded Ore Support
                 String[] tagStringSplit = ConfigHandler.SERVER.oresTag.get().split(":");
@@ -181,7 +194,7 @@ public class EventHandler {
                         .withParameter(LootParameters.ORIGIN, new Vector3d(blockPos.getX(), blockPos.getY(), blockPos.getZ()))
                         .withParameter(LootParameters.TOOL, mainHandItem));
                 DragonStateProvider.getCap(playerEntity).ifPresent(dragonStateHandler -> {
-                    final boolean suitableOre = (playerEntity.getMainHandItem().isCorrectToolForDrops(blockState) ||
+                    final boolean suitableOre = (mainHandItem.isCorrectToolForDrops(blockState) ||
                                                  (dragonStateHandler.isDragon() && dragonStateHandler.canHarvestWithPaw(playerEntity, blockState)))
                                                 && drops.stream().noneMatch(item -> oresTag.contains(item.getItem()));
                     if (suitableOre && !playerEntity.isCreative()) {

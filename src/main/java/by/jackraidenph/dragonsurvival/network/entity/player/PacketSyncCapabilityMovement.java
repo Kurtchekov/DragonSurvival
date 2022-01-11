@@ -8,7 +8,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -53,22 +52,9 @@ public class PacketSyncCapabilityMovement implements IMessage<PacketSyncCapabili
         return new PacketSyncCapabilityMovement(b.readInt(), b.readDouble(), b.readDouble(), b.readDouble(), b.readBoolean()
         );
     }
-
-    private void writeVec3d(PacketBuffer buffer, Vector3d vec) {
-        buffer.writeDouble(vec.x);
-        buffer.writeDouble(vec.y);
-        buffer.writeDouble(vec.z);
-    }
-
-    private Vector3d readVec3d(PacketBuffer buffer) {
-        double x = buffer.readDouble();
-        double y = buffer.readDouble();
-        double z = buffer.readDouble();
-        return new Vector3d(x, y, z);
-    }
-
+	
     @Override
-    public void handle(PacketSyncCapabilityMovement syncCapabilityMovement, Supplier<NetworkEvent.Context> supplier) { // TODO Clean this up
+    public void handle(PacketSyncCapabilityMovement syncCapabilityMovement, Supplier<NetworkEvent.Context> supplier) {
     	NetworkEvent.Context context = supplier.get();
     	ServerPlayerEntity player = context.getSender();
     	if (player == null) {
@@ -101,10 +87,7 @@ public class PacketSyncCapabilityMovement implements IMessage<PacketSyncCapabili
 				Entity entity = world.getEntity(message.playerId);
 				if (entity instanceof PlayerEntity) {
 					DragonStateProvider.getCap(entity).ifPresent(dragonStateHandler -> {
-						if (entity == thisPlayer)
-							dragonStateHandler.setMovementData(message.bodyYaw, ((PlayerEntity) entity).yHeadRot, entity.xRot, message.bite);
-						else
-							dragonStateHandler.setMovementData(message.bodyYaw, message.headYaw, message.headPitch, message.bite);
+						dragonStateHandler.setMovementData(message.bodyYaw, message.headYaw, message.headPitch, message.bite);
 					});
 				}
 			}

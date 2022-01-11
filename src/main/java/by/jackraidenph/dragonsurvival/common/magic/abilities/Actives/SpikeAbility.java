@@ -1,13 +1,16 @@
 package by.jackraidenph.dragonsurvival.common.magic.abilities.Actives;
 
-import by.jackraidenph.dragonsurvival.config.ConfigHandler;
-import by.jackraidenph.dragonsurvival.common.entity.projectiles.DragonSpikeEntity;
 import by.jackraidenph.dragonsurvival.client.handlers.KeyInputHandler;
-import by.jackraidenph.dragonsurvival.common.magic.common.ActiveDragonAbility;
+import by.jackraidenph.dragonsurvival.common.capability.DragonStateHandler;
+import by.jackraidenph.dragonsurvival.common.capability.DragonStateProvider;
 import by.jackraidenph.dragonsurvival.common.entity.DSEntities;
+import by.jackraidenph.dragonsurvival.common.entity.projectiles.DragonSpikeEntity;
+import by.jackraidenph.dragonsurvival.common.magic.common.ActiveDragonAbility;
+import by.jackraidenph.dragonsurvival.config.ConfigHandler;
 import by.jackraidenph.dragonsurvival.misc.DragonType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.AbstractArrowEntity;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -69,8 +72,18 @@ public class SpikeAbility extends ActiveDragonAbility
 	public void onActivation(PlayerEntity player)
 	{
 		super.onActivation(player);
+		Vector3d vector3d = player.getViewVector(1.0F);
+		double speed = 1d;
+		double d2 = vector3d.x * speed;
+		double d3 = vector3d.y * speed;
+		double d4 = vector3d.z * speed;
 		
+		DragonStateHandler handler = DragonStateProvider.getCap(player).orElse(null);
+		if(handler == null) return;
+		handler.getMovementData().bite = true;
+
 		DragonSpikeEntity entity = new DragonSpikeEntity(DSEntities.DRAGON_SPIKE, player.level, player);
+		entity.setPos(entity.getX() + d2, entity.getY() + d3, entity.getZ() + d4);
 		entity.setArrow_level(getLevel());
 		entity.setBaseDamage(getDamage());
 		entity.pickup = AbstractArrowEntity.PickupStatus.DISALLOWED;
@@ -83,6 +96,4 @@ public class SpikeAbility extends ActiveDragonAbility
 	{
 		return super.isDisabled() || !ConfigHandler.SERVER.spike.get();
 	}
-	
-	public int getCastingSlowness() { return 0; }
 }

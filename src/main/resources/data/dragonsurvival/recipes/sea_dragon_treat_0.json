@@ -10,11 +10,11 @@
       "item": "dragonsurvival:elder_dragon_dust"
     },
     "S": {
-      "tag": "forge:raw_meats"
+      "item": "minecraft:pufferfish"
     }
   },
   "result": {
-    "item": "dragonsurvival:forest_dragon_treat",
+    "item": "dragonsurvival:sea_dragon_treat",
     "count": 1
   }
 }

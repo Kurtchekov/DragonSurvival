@@ -60,7 +60,8 @@ public class BallLightningEntity extends DragonBallEntity
 				if(ent instanceof LivingEntity) {
 					LivingEntity livingEntity = (LivingEntity)ent;
 					if (livingEntity.level.random.nextInt(100) < 40) {
-						livingEntity.addEffect(new EffectInstance(DragonEffects.CHARGED, Functions.secondsToTicks(10), 0, false, true));
+						if(!livingEntity.level.isClientSide)
+							livingEntity.addEffect(new EffectInstance(DragonEffects.CHARGED, Functions.secondsToTicks(10), 0, false, true));
 					}
 				}
 				

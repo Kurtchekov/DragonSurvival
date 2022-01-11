@@ -4,10 +4,10 @@ import by.jackraidenph.dragonsurvival.common.capability.DragonStateHandler;
 import by.jackraidenph.dragonsurvival.common.capability.DragonStateProvider;
 import by.jackraidenph.dragonsurvival.common.handlers.DragonFoodHandler;
 import by.jackraidenph.dragonsurvival.common.handlers.DragonSizeHandler;
+import by.jackraidenph.dragonsurvival.common.handlers.magic.ClawToolHandler;
 import by.jackraidenph.dragonsurvival.config.ConfigHandler;
 import by.jackraidenph.dragonsurvival.misc.DragonType;
 import net.minecraft.advancements.CriteriaTriggers;
-import net.minecraft.block.BlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -32,7 +32,8 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.FoodStats;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Final;
@@ -64,6 +65,28 @@ public abstract class MixinPlayerEntity extends LivingEntity{
 	protected MixinPlayerEntity(EntityType<? extends LivingEntity> p_i48577_1_, World p_i48577_2_) {
 		super(p_i48577_1_, p_i48577_2_);
 	}
+	@Inject( method = "isImmobile", at = @At("HEAD"), cancellable = true)
+	private void castMovement(CallbackInfoReturnable<Boolean> ci){
+		DragonStateHandler cap = DragonStateProvider.getCap(this).orElse(null);
+		
+		if(!isDeadOrDying() && !isSleeping()) {
+			if (!((PlayerEntity)(LivingEntity)this).isCreative()) {
+				if (cap.getMagic().getCurrentlyCasting() != null) {
+					if (!cap.getMagic().getCurrentlyCasting().canMoveWhileCasting()) {
+						if (!ConfigHandler.SERVER.canMoveWhileCasting.get()) {
+							ci.setReturnValue(true);
+						}
+					}
+				}
+			}
+			
+			if (cap.getEmotes().getCurrentEmote() != null) {
+				if (!ConfigHandler.SERVER.canMoveInEmote.get()) {
+					ci.setReturnValue(true);
+				}
+			}
+		}
+	}
 	
 	@Redirect( method = "attack",
 	           at = @At(value="INVOKE", target="Lnet/minecraft/entity/player/PlayerEntity;getMainHandItem()Lnet/minecraft/item/ItemStack;" ))
@@ -87,45 +110,7 @@ public abstract class MixinPlayerEntity extends LivingEntity{
 	           at = @At(value="INVOKE", target="Lnet/minecraft/entity/player/PlayerEntity;getMainHandItem()Lnet/minecraft/item/ItemStack;" ))
 	private ItemStack getDragonTools(PlayerEntity entity)
 	{
-		ItemStack mainStack = entity.getMainHandItem();
-		DragonStateHandler cap = DragonStateProvider.getCap(entity).orElse(null);
-		
-		if(!(mainStack.getItem() instanceof TieredItem) && cap != null) {
-			float newSpeed = 0F;
-			ItemStack harvestTool = null;
-			
-			Vector3d vector3d = entity.getDeltaMovement();
-			World world = entity.level;
-			Vector3d vector3d1 = entity.position();
-			Vector3d vector3d2 = vector3d1.add(vector3d);
-			BlockRayTraceResult raytraceresult = world.clip(new RayTraceContext(vector3d1, vector3d2, RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, entity));
-			
-			if (raytraceresult != null && raytraceresult.getType() != RayTraceResult.Type.MISS) {
-				BlockState state = world.getBlockState(raytraceresult.getBlockPos());
-				
-				for (int i = 1; i < 4; i++) {
-					if (state.getHarvestTool() == null || state.getHarvestTool() == DragonStateHandler.CLAW_TOOL_TYPES[i]) {
-						ItemStack breakingItem = cap.getClawInventory().getClawsInventory().getItem(i);
-						if (!breakingItem.isEmpty()) {
-							float tempSpeed = breakingItem.getDestroySpeed(state);
-							
-							if (tempSpeed > newSpeed) {
-								newSpeed = tempSpeed;
-								harvestTool = breakingItem;
-							}
-						}
-					}
-				}
-				
-			}
-			
-			
-			if(harvestTool != null && !harvestTool.isEmpty()){
-				return harvestTool;
-			}
-		}
-		
-		return mainStack;
+		return ClawToolHandler.getDragonTools(entity);
 	}
 	
 	@Inject( method = "isSleepingLongEnough", at = @At("HEAD"), cancellable = true)

@@ -80,6 +80,7 @@ public class SkinsScreen extends Screen
 	private float zoom = 0;
 	
 	private static String playerName = null;
+	private static String lastPlayerName = null;
 	private static DragonLevel level = DragonLevel.ADULT;
 	
 	private DragonEntity dragon;
@@ -123,9 +124,14 @@ public class SkinsScreen extends Screen
 		
 		SkinsScreen.glowTexture = glowTexture;
 		SkinsScreen.skinTexture = skinTexture;
-		zoom = level.size;
+		
+		if(Objects.equals(lastPlayerName, playerName) || lastPlayerName == null) {
+			zoom = level.size;
+		}
+		
 		noSkin = defaultSkin;
 		loading = false;
+		lastPlayerName = playerName;
 	}
 	
 	@Override
@@ -529,14 +535,14 @@ public class SkinsScreen extends Screen
 		return true;
 	}
 	
-	public void drawNonShadowString(MatrixStack p_238472_0_, FontRenderer p_238472_1_, ITextComponent p_238472_2_, int p_238472_3_, int p_238472_4_, int p_238472_5_) {
+	public static void drawNonShadowString(MatrixStack p_238472_0_, FontRenderer p_238472_1_, ITextComponent p_238472_2_, int p_238472_3_, int p_238472_4_, int p_238472_5_) {
 		p_238472_1_.draw(p_238472_0_, LanguageMap.getInstance().getVisualOrder(p_238472_2_), (int)(p_238472_3_ - p_238472_1_.width(p_238472_2_) / 2), (int)p_238472_4_, p_238472_5_);
 	}
 	
-	public void drawNonShadowLineBreak(MatrixStack p_238472_0_, FontRenderer p_238472_1_, ITextComponent p_238472_2_, int p_238472_3_, int p_238472_4_, int p_238472_5_) {
+	public static void drawNonShadowLineBreak(MatrixStack p_238472_0_, FontRenderer p_238472_1_, ITextComponent p_238472_2_, int p_238472_3_, int p_238472_4_, int p_238472_5_) {
 		IReorderingProcessor ireorderingprocessor = p_238472_2_.getVisualOrderText();
 		
-		List<ITextProperties> wrappedLine = font.getSplitter().splitLines(p_238472_2_, 150, Style.EMPTY);
+		List<ITextProperties> wrappedLine = p_238472_1_.getSplitter().splitLines(p_238472_2_, 150, Style.EMPTY);
 		int i = 0;
 		for(ITextProperties properties : wrappedLine){
 			p_238472_1_.draw(p_238472_0_, LanguageMap.getInstance().getVisualOrder(properties), (int)(p_238472_3_ - p_238472_1_.width(ireorderingprocessor) / 2), (int)p_238472_4_ + i * 9, p_238472_5_);

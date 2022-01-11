@@ -73,8 +73,9 @@ public class DragonBonusHandler
         LivingEntity livingEntity = livingFallEvent.getEntityLiving();
         DragonStateProvider.getCap(livingEntity).ifPresent(dragonStateHandler -> {
             if (dragonStateHandler.isDragon()) {
-                if (dragonStateHandler.getType() == DragonType.FOREST) {
-					float distance = livingFallEvent.getDistance();
+	            float distance = livingFallEvent.getDistance();
+	
+	            if (dragonStateHandler.getType() == DragonType.FOREST) {
 					
 					if(ConfigHandler.SERVER.bonuses.get()){
 						distance -= ConfigHandler.SERVER.forestFallReduction.get().floatValue();
@@ -85,9 +86,9 @@ public class DragonBonusHandler
 					if(ability != null){
 						distance -= ((CliffhangerAbility)ability).getHeight();
 					}
-	
-	                livingFallEvent.setDistance(distance);
                 }
+	            distance -= dragonStateHandler.getLevel().jumpHeight;
+	            livingFallEvent.setDistance(distance);
             }
         });
     }

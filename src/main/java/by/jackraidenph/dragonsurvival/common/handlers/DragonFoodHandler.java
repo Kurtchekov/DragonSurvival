@@ -27,6 +27,7 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -35,7 +36,9 @@ import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Stream;
@@ -229,7 +232,7 @@ public class DragonFoodHandler {
 	
 	public static boolean isDragonEdible(Item item, DragonType type) {
 		if (ConfigHandler.SERVER.customDragonFoods.get() && type != DragonType.NONE)
-			return DRAGON_FOODS.get(type).containsKey(item);
+			return DRAGON_FOODS != null && DRAGON_FOODS.containsKey(type) && item != null && DRAGON_FOODS.get(type).containsKey(item);
 		return item.getFoodProperties() != null;
 	}
 	
@@ -304,7 +307,9 @@ public class DragonFoodHandler {
 		});
 	}
 	
-	@SubscribeEvent
+	public static int rightHeight = 0;
+	
+	@SubscribeEvent(priority = EventPriority.LOWEST)
 	@OnlyIn(Dist.CLIENT)
 	public void onRenderFoodBar(RenderGameOverlayEvent.Pre event) {
 		ClientPlayerEntity player = this.mc.player;
@@ -319,19 +324,24 @@ public class DragonFoodHandler {
 				if (event.getType() != RenderGameOverlayEvent.ElementType.FOOD || player.isCreative() || player.isSpectator())
 					return;
 				
-				event.setCanceled(true);
+				//event.setCanceled(true);
 				
 				rand.setSeed(player.tickCount * 312871L);
 				
 				RenderSystem.enableBlend();
 				this.mc.getTextureManager().bind(FOOD_ICONS);
 				
-				final int right_height = ForgeIngameGui.right_height;
-				ForgeIngameGui.right_height += 10;
+				if(ConfigHandler.CLIENT.appleskinSupport.get()) {
+					rightHeight = ForgeIngameGui.right_height;
+					ForgeIngameGui.right_height = 0;
+				}else{
+					rightHeight = ForgeIngameGui.right_height;
+					ForgeIngameGui.right_height += 10;
+				}
 				
 				final int left = this.mc.getWindow().getGuiScaledWidth() / 2 + 91;
-                final int top = this.mc.getWindow().getGuiScaledHeight() - right_height;
-                
+                final int top = this.mc.getWindow().getGuiScaledHeight() - rightHeight;
+				rightHeight += 10;
                 final FoodStats food = player.getFoodData();
 
                 final int type = dragonStateHandler.getType() == DragonType.FOREST ? 0 : dragonStateHandler.getType() == DragonType.CAVE ? 9 : 18;
@@ -355,6 +365,32 @@ public class DragonFoodHandler {
                 
         		this.mc.getTextureManager().bind(AbstractGui.GUI_ICONS_LOCATION);
         		RenderSystem.disableBlend();
+			} else
+				isDrawingOverlay = false;
+		});
+	}
+	
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	@OnlyIn(Dist.CLIENT)
+	public void onPostRenderFood(RenderGameOverlayEvent.Post event) {
+		if(!ConfigHandler.CLIENT.appleskinSupport.get()){
+			return;
+		}
+		
+		ClientPlayerEntity player = this.mc.player;
+		
+		isDrawingOverlay = !event.isCanceled() && ConfigHandler.SERVER.customDragonFoods.get();
+		if (!isDrawingOverlay)
+			return;
+		
+		DragonStateProvider.getCap(player).ifPresent(dragonStateHandler -> {
+			if (dragonStateHandler.isDragon()) {
+				
+				if (event.getType() != RenderGameOverlayEvent.ElementType.FOOD || player.isCreative() || player.isSpectator())
+					return;
+				
+				ForgeIngameGui.right_height = rightHeight;
+				
 			} else
 				isDrawingOverlay = false;
 		});

@@ -8,6 +8,7 @@ import by.jackraidenph.dragonsurvival.client.sounds.SoundRegistry;
 import by.jackraidenph.dragonsurvival.common.DragonEffects;
 import by.jackraidenph.dragonsurvival.common.capability.Capabilities;
 import by.jackraidenph.dragonsurvival.common.capability.GenericCapability;
+import by.jackraidenph.dragonsurvival.common.handlers.DragonConfigHandler;
 import by.jackraidenph.dragonsurvival.config.ConfigHandler;
 import by.jackraidenph.dragonsurvival.misc.DragonType;
 import by.jackraidenph.dragonsurvival.util.Functions;
@@ -60,7 +61,7 @@ public class ForestBreathAbility extends BreathAbility
 	@Override
 	public int getManaCost()
 	{
-		return (firstUse ? ConfigHandler.SERVER.forestBreathInitialMana.get() : ConfigHandler.SERVER.forestBreathOvertimeMana.get());
+		return player != null && player.hasEffect(DragonEffects.SOURCE_OF_MAGIC) ? 0 :(firstUse ? ConfigHandler.SERVER.forestBreathInitialMana.get() : ConfigHandler.SERVER.forestBreathOvertimeMana.get());
 	}
 	
 	public void tickCost(){
@@ -203,7 +204,7 @@ public class ForestBreathAbility extends BreathAbility
 	@Override
 	public boolean canHitEntity(LivingEntity entity)
 	{
-		return true;
+		return !(entity instanceof PlayerEntity) || player.canHarmPlayer(((PlayerEntity)entity));
 	}
 	
 	@Override
@@ -239,13 +240,15 @@ public class ForestBreathAbility extends BreathAbility
 		if(blockState.getBlock() != Blocks.GRASS_BLOCK && blockState.getBlock() != Blocks.GRASS) {
 			if (player.level.random.nextInt(100) < 50) {
 				if (blockState.getBlock() instanceof IGrowable) {
-					IGrowable igrowable = (IGrowable)blockState.getBlock();
-					if (igrowable.isValidBonemealTarget(player.level, pos, blockState, player.level.isClientSide)) {
-						if (player.level instanceof ServerWorld) {
-							if (igrowable.isBonemealSuccess(player.level, player.level.random, pos, blockState)) {
-								for (int i = 0; i < 3; i++) {
-									if(igrowable != null) {
-										igrowable.performBonemeal((ServerWorld)player.level, player.level.random, pos, blockState);
+					if (!DragonConfigHandler.FOREST_DRAGON_BREATH_GROW_BLACKLIST.contains(blockState.getBlock())) {
+						IGrowable igrowable = (IGrowable)blockState.getBlock();
+						if (igrowable.isValidBonemealTarget(player.level, pos, blockState, player.level.isClientSide)) {
+							if (player.level instanceof ServerWorld) {
+								if (igrowable.isBonemealSuccess(player.level, player.level.random, pos, blockState)) {
+									for (int i = 0; i < 3; i++) {
+										if (igrowable != null) {
+											igrowable.performBonemeal((ServerWorld)player.level, player.level.random, pos, blockState);
+										}
 									}
 								}
 							}

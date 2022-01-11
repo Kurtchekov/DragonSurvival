@@ -1,11 +1,9 @@
-package by.jackraidenph.dragonsurvival.client.handlers;
+package by.jackraidenph.dragonsurvival.client.emotes;
 
 import by.jackraidenph.dragonsurvival.DragonSurvivalMod;
 import by.jackraidenph.dragonsurvival.common.capability.DragonStateHandler;
 import by.jackraidenph.dragonsurvival.common.capability.DragonStateProvider;
 import by.jackraidenph.dragonsurvival.config.ConfigHandler;
-import by.jackraidenph.dragonsurvival.client.emotes.Emote;
-import by.jackraidenph.dragonsurvival.client.emotes.EmoteRegistry;
 import by.jackraidenph.dragonsurvival.network.NetworkHandler;
 import by.jackraidenph.dragonsurvival.network.emotes.SyncEmoteServer;
 import by.jackraidenph.dragonsurvival.network.emotes.SyncEmoteStatsServer;

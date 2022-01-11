@@ -10,11 +10,11 @@
       "item": "dragonsurvival:elder_dragon_dust"
     },
     "S": {
-      "tag": "forge:raw_fishes"
+      "item": "minecraft:poisonous_potato"
     }
   },
   "result": {
-    "item": "dragonsurvival:sea_dragon_treat",
+    "item": "dragonsurvival:forest_dragon_treat",
     "count": 1
   }
 }

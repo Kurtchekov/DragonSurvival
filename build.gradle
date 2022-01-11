@@ -160,7 +160,10 @@ dependencies {
     compileOnly fg.deobf("mezz.jei:jei-${property('mc_version')}:${property('jei_version')}:api")
     runtimeOnly fg.deobf("mezz.jei:jei-${property('mc_version')}:${property('jei_version')}")
 
-	annotationProcessor 'org.spongepowered:mixin:0.8.3:processor'
+    compile files("lib/appleskin-api.jar")
+    runtimeOnly fg.deobf("curse.maven:appleskin-248787:3512372")
+
+    annotationProcessor 'org.spongepowered:mixin:0.8.3:processor'
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..

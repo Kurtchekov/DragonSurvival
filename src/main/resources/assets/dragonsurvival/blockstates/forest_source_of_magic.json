@@ -1,19 +1,35 @@
 {
   "variants": {
-    "facing=north": {
+    "facing=north,filled=true": {
       "model": "dragonsurvival:block/source_of_magic_forest",
       "x": 0
     },
-    "facing=south": {
+    "facing=south,filled=true": {
       "model": "dragonsurvival:block/source_of_magic_forest",
       "y": 180
     },
-    "facing=east": {
+    "facing=east,filled=true": {
       "model": "dragonsurvival:block/source_of_magic_forest",
       "y": 90
     },
-    "facing=west": {
+    "facing=west,filled=true": {
       "model": "dragonsurvival:block/source_of_magic_forest",
+      "y": 270
+    },
+    "facing=north,filled=false": {
+      "model": "dragonsurvival:block/source_of_magic_forest_empty",
+      "x": 0
+    },
+    "facing=south,filled=false": {
+      "model": "dragonsurvival:block/source_of_magic_forest_empty",
+      "y": 180
+    },
+    "facing=east,filled=false": {
+      "model": "dragonsurvival:block/source_of_magic_forest_empty",
+      "y": 90
+    },
+    "facing=west,filled=false": {
+      "model": "dragonsurvival:block/source_of_magic_forest_empty",
       "y": 270
     }
   }

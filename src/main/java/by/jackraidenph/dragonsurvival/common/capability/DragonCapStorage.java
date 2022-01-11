@@ -17,6 +17,10 @@ public class DragonCapStorage implements Capability.IStorage<DragonStateHandler>
     
         if (instance.isDragon()) {
             DragonStateHandler.DragonMovementData movementData = instance.getMovementData();
+            tag.putDouble("bodyYaw", movementData.bodyYaw);
+            tag.putDouble("headYaw", movementData.headYaw);
+            tag.putDouble("headPitch", movementData.headPitch);
+            
             tag.putInt("spinCooldown", movementData.spinCooldown);
             tag.putInt("spinAttack", movementData.spinAttack);
             tag.putBoolean("spinLearned", movementData.spinLearned);
@@ -65,6 +69,8 @@ public class DragonCapStorage implements Capability.IStorage<DragonStateHandler>
         	instance.setType(DragonType.valueOf(tag.getString("type")));
         
         if (instance.isDragon()) {
+            instance.setMovementData(tag.getDouble("bodyYaw"), tag.getDouble("headYaw"), tag.getDouble("headPitch"), tag.getBoolean("bite"));
+    
             instance.setHasWings(tag.getBoolean("hasWings"));
             instance.setWingsSpread(tag.getBoolean("isFlying"));
             
@@ -77,9 +83,9 @@ public class DragonCapStorage implements Capability.IStorage<DragonStateHandler>
             instance.setIsHiding(tag.getBoolean("isHiding"));
             
             instance.setSize(tag.getDouble("size"));
-            instance.growing = !tag.contains("growing") || tag.getBoolean("growing");
+            instance.growing =!tag.contains("growing") || tag.getBoolean("growing");
     
-            instance.growing = tag.getBoolean("resting");
+            instance.treasureResting = tag.getBoolean("resting");
             instance.treasureRestTimer = tag.getInt("restingTimer");
     
             instance.caveSize = tag.getDouble("caveSize");

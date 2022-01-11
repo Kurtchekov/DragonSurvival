@@ -116,9 +116,16 @@ public class AoeBuffAbility extends ActiveDragonAbility
 		player.level.playLocalSound(player.position().x, player.position().y + 0.5, player.position().z, SoundEvents.UI_TOAST_OUT, SoundCategory.PLAYERS, 5F, 0.1F, false);
 	}
 	
-	public int getCastingSlowness() { return 10; }
+	public boolean canMoveWhileCasting(){ return false; }
 	
 	public int getDuration(){
+		if(effect.getEffect() == Effects.DIG_SPEED){
+			return ConfigHandler.SERVER.inspirationDuration.get();
+		}else if(effect.getEffect() == DragonEffects.REVEALING_THE_SOUL){
+			return ConfigHandler.SERVER.revealingTheSoulDuration.get();
+		}else if(effect.getEffect() == DragonEffects.STRONG_LEATHER){
+			return ConfigHandler.SERVER.toughSkinDuration.get();
+		}
 		return getLevel() * (effect.getDuration() > 0 ? effect.getDuration() : 30);
 	}
 	

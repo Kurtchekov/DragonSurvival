@@ -1,5 +1,6 @@
 package by.jackraidenph.dragonsurvival.common.magic.common;
 
+import by.jackraidenph.dragonsurvival.config.ConfigHandler;
 import by.jackraidenph.dragonsurvival.misc.DragonType;
 
 public class PassiveDragonAbility extends DragonAbility {
@@ -10,7 +11,7 @@ public class PassiveDragonAbility extends DragonAbility {
 	}
 	
 	public int getLevelCost(){
-		return 4 + (int)(0.75 * getLevel());
+		return ConfigHandler.SERVER.initialPassiveCost.get() + (int)(ConfigHandler.SERVER.passiveScalingCost.get() * getLevel());
 	}
 	
 	@Override

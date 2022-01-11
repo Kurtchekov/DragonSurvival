@@ -1,3 +1,6 @@
 {
-  "parent": "dragonsurvival:block/source_of_magic_forest"
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "dragonsurvival:item/source_of_magic_forest"
+  }
 }

@@ -10,11 +10,11 @@
       "item": "dragonsurvival:elder_dragon_dust"
     },
     "S": {
-      "tag": "dragonsurvival:cooked_seafood"
+      "item": "minecraft:spider_eye"
     }
   },
   "result": {
-    "item": "dragonsurvival:cave_dragon_treat",
+    "item": "dragonsurvival:forest_dragon_treat",
     "count": 1
   }
 }

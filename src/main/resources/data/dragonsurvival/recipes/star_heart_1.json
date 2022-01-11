@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "CCC",
+    "CCC",
+    "CCC"
+  ],
+  "key": {
+    "C": {
+      "item": "dragonsurvival:star_bone"
+    }
+  },
+  "result": {
+    "item": "dragonsurvival:star_heart",
+    "count": 1
+  }
+}

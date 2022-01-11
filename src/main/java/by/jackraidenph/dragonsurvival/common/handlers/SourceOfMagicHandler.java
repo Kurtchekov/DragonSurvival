@@ -47,7 +47,7 @@ public class SourceOfMagicHandler
 			
 			if(handler != null){
 				if(handler.getMagic().onMagicSource){
-					if(!(player.getFeetBlockState().getBlock() instanceof SourceOfMagicBlock) || handler.getMovementData().bite){
+					if(!(player.getFeetBlockState().getBlock() instanceof SourceOfMagicBlock) || handler.getMovementData().bite || player.isCrouching() && handler.getMagic().magicSourceTimer > 40){
 						handler.getMagic().onMagicSource = false;
 						handler.getMagic().magicSourceTimer = 0;
 						NetworkHandler.CHANNEL.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player), new SyncMagicSourceStatus(player.getId(), false, 0));
@@ -136,12 +136,8 @@ public class SourceOfMagicHandler
 										double x = -1 + random.nextDouble() * 2;
 										double z = -1 + random.nextDouble() * 2;
 										
-										switch (handler.getType()) {
+										switch (tile.type) {
 											case SEA:
-												if (!minecraft.isPaused()){
-													player.level.addParticle(DSParticles.peaceBeaconParticle, player.getX() + x, player.getY() + 0.5, player.getZ() + z, 0, 0, 0);
-												}
-												break;
 											case FOREST:
 												if (!minecraft.isPaused()){
 													player.level.addParticle(DSParticles.magicBeaconParticle, player.getX() + x, player.getY() + 0.5, player.getZ() + z, 0, 0, 0);

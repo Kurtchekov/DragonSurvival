@@ -1,6 +1,7 @@
 package by.jackraidenph.dragonsurvival.server.tileentity;
 
 import by.jackraidenph.dragonsurvival.common.blocks.DSBlocks;
+import by.jackraidenph.dragonsurvival.common.blocks.SourceOfMagicBlock;
 import by.jackraidenph.dragonsurvival.common.items.DSItems;
 import by.jackraidenph.dragonsurvival.config.ConfigHandler;
 import by.jackraidenph.dragonsurvival.misc.DragonType;
@@ -58,6 +59,14 @@ public class SourceOfMagicTileEntity extends BaseBlockTileEntity implements ITic
             type = DragonType.FOREST;
         }else if(getBlockState().getBlock() == DSBlocks.caveSourceOfMagic){
             type = DragonType.CAVE;
+        }
+        
+        BlockState state = getBlockState();
+        
+        if(!state.getValue(SourceOfMagicBlock.FILLED) && !isEmpty()){
+            level.setBlockAndUpdate(getBlockPos(), state.setValue(SourceOfMagicBlock.FILLED, true));
+        }else if(state.getValue(SourceOfMagicBlock.FILLED) && isEmpty()){
+            level.setBlockAndUpdate(getBlockPos(), state.setValue(SourceOfMagicBlock.FILLED, false));
         }
     }
     

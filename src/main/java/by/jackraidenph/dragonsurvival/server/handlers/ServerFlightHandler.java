@@ -18,6 +18,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.gen.Heightmap.Type;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.Phase;
@@ -157,6 +158,7 @@ public class ServerFlightHandler {
 					List<Entity> entities = player.level.getEntities(null, new AxisAlignedBB(player.position().x - range, player.position().y - range, player.position().z - range, player.position().x + range, player.position().y + range, player.position().z + range));
 					entities.removeIf((e) -> e.distanceTo(player) > range);
 					entities.remove(player);
+					entities.removeIf((e) -> e instanceof PlayerEntity && !player.canHarmPlayer((PlayerEntity)e));
 					
 					for(Entity ent : entities){
 						if(player.hasPassenger(ent)) continue;
@@ -191,27 +193,37 @@ public class ServerFlightHandler {
     @SubscribeEvent
     public static void playerFoodExhaustion(TickEvent.PlayerTickEvent playerTickEvent) {
         if(playerTickEvent.phase == Phase.START) return;
-    
-        DragonStateProvider.getCap(playerTickEvent.player).ifPresent(dragonStateHandler -> {
+        PlayerEntity player = playerTickEvent.player;
+		
+        DragonStateProvider.getCap(player).ifPresent(dragonStateHandler -> {
             if(dragonStateHandler.isDragon()) {
                 boolean wingsSpread = dragonStateHandler.isWingsSpread();
-                if(ConfigHandler.SERVER.creativeFlight.get() && !playerTickEvent.player.level.isClientSide){
-                    if(playerTickEvent.player.abilities.flying != wingsSpread && (!playerTickEvent.player.isCreative() && !playerTickEvent.player.isSpectator())){
-                        playerTickEvent.player.abilities.flying = wingsSpread;
-                        playerTickEvent.player.onUpdateAbilities();
+                if(ConfigHandler.SERVER.creativeFlight.get() && !player.level.isClientSide){
+                    if(player.abilities.flying != wingsSpread && (!player.isCreative() && !player.isSpectator())){
+                        player.abilities.flying = wingsSpread;
+                        player.onUpdateAbilities();
                     }
                 }
                 
                 if (wingsSpread) {
                     if (ConfigHandler.SERVER.flyingUsesHunger.get()) {
-                        if (isFlying(playerTickEvent.player)) {
-                            Vector3d delta = playerTickEvent.player.getDeltaMovement();
+                        if (isFlying(player)) {
+							if(!player.level.isClientSide) {
+								if (player.getFoodData().getFoodLevel() <= ConfigHandler.SERVER.foldWingsThreshold.get() && !ConfigHandler.SERVER.allowFlyingWithoutHunger.get() && !player.isCreative()) {
+									player.sendMessage(new TranslationTextComponent("ds.wings.nohunger"), player.getUUID());
+									dragonStateHandler.setWingsSpread(false);
+									NetworkHandler.CHANNEL.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player), new SyncFlyingStatus(player.getId(), false));
+									return;
+								}
+							}
+							
+                            Vector3d delta = player.getDeltaMovement();
                             double l = delta.length();
                             if(delta.x == 0 && delta.z == 0){
                                 l = 15;
                             }
-                            float exhaustion = ConfigHandler.SERVER.creativeFlight.get() ? (playerTickEvent.player.abilities.flying ?  playerTickEvent.player.flyingSpeed : 0F) : (float)(0.005F * l);
-                            playerTickEvent.player.causeFoodExhaustion(exhaustion);
+                            float exhaustion = ConfigHandler.SERVER.creativeFlight.get() ? (player.abilities.flying ?  player.flyingSpeed : 0F) : (float)(0.005F * l);
+                            player.causeFoodExhaustion(exhaustion);
                         }
                     }
                 }

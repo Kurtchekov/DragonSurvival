@@ -44,6 +44,14 @@ public class Functions {
         return ticksToSeconds(ticks) / 60;
     }
 
+    public static float angleDifference(float angle1, float angle2){
+        float phi = Math.abs(angle1 - angle2) % 360;
+        float dif = phi > 180 ? 360 - phi : phi;
+        int sign = (angle1 - angle2 >= 0 && angle1 - angle2 <= 180) || (angle1 - angle2 <= -180 && angle1- angle2>= -360) ? 1 : -1;
+        dif *= sign;
+        return dif;
+    }
+    
     @Nullable
     public static BlockPos findRandomSpawnPosition(PlayerEntity playerEntity, int p_221298_1_, int timesToCheck, float distance) {
         int i = (p_221298_1_ == 0) ? 2 : (2 - p_221298_1_);

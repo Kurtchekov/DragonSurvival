@@ -1,0 +1,14 @@
+{
+  "type": "crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "dragonsurvival:predator_star"
+    },
+    {
+      "item": "dragonsurvival:elder_dragon_bone"
+    }
+  ],
+  "result": {
+    "item": "dragonsurvival:star_bone"
+  }
+}

@@ -6,4 +6,5 @@ public class GenericCapability
 {
     public Vector3d lastPos;
     public int lastAfflicted = -1;
+    public int chainCount = 0;
 }

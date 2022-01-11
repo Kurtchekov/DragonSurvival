@@ -67,8 +67,7 @@ public class ToughSkinAbility extends AoeBuffAbility
 		return components;
 	}
 	
-	public int getCastingSlowness() { return 10; }
-	
+	public boolean canMoveWhileCasting(){ return false; }
 	@OnlyIn( Dist.CLIENT )
 	public ArrayList<ITextComponent> getLevelUpInfo(){
 		ArrayList<ITextComponent> list = super.getLevelUpInfo();

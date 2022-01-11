@@ -7,8 +7,10 @@ import by.jackraidenph.dragonsurvival.network.magic.SyncDragonAbilitySlot;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.client.util.InputMappings.Type;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
+import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
@@ -31,36 +33,58 @@ public class KeyInputHandler
 	public static KeyBinding ABILITY3;
 	public static KeyBinding ABILITY4;
 	
+	public static KeyBinding SPIN_ABILITY;
+	public static KeyBinding FREE_LOOK;
+	
+	
 	public static void setupKeybinds() {
 		TOGGLE_WINGS = new KeyBinding("ds.keybind.wings", GLFW.GLFW_KEY_G, "Dragon Survival");
+		TOGGLE_WINGS.setKeyConflictContext(KeyConflictContext.IN_GAME);
 		ClientRegistry.registerKeyBinding(TOGGLE_WINGS);
 		
 		DRAGON_INVENTORY = new KeyBinding("ds.keybind.dragon_inv", GLFW.GLFW_KEY_UNKNOWN, "Dragon Survival");
+		DRAGON_INVENTORY.setKeyConflictContext(KeyConflictContext.IN_GAME);
 		ClientRegistry.registerKeyBinding(DRAGON_INVENTORY);
 		
 		USE_ABILITY = new KeyBinding("ds.keybind.use_ability", GLFW.GLFW_KEY_C, "Dragon Survival");
+		USE_ABILITY.setKeyConflictContext(KeyConflictContext.IN_GAME);
 		ClientRegistry.registerKeyBinding(USE_ABILITY);
 		
 		TOGGLE_ABILITIES = new KeyBinding("ds.keybind.toggle_abilities", GLFW.GLFW_KEY_X, "Dragon Survival");
+		TOGGLE_ABILITIES.setKeyConflictContext(KeyConflictContext.IN_GAME);
 		ClientRegistry.registerKeyBinding(TOGGLE_ABILITIES);
 		
 		NEXT_ABILITY = new KeyBinding("ds.keybind.next_ability", GLFW.GLFW_KEY_R, "Dragon Survival");
+		NEXT_ABILITY.setKeyConflictContext(KeyConflictContext.IN_GAME);
 		ClientRegistry.registerKeyBinding(NEXT_ABILITY);
 		
 		PREV_ABILITY = new KeyBinding("ds.keybind.prev_ability", GLFW.GLFW_KEY_F, "Dragon Survival");
+		PREV_ABILITY.setKeyConflictContext(KeyConflictContext.IN_GAME);
 		ClientRegistry.registerKeyBinding(PREV_ABILITY);
 		
 		ABILITY1 = new KeyBinding("ds.keybind.ability1", GLFW.GLFW_KEY_UNKNOWN, "Dragon Survival");
+		ABILITY1.setKeyConflictContext(KeyConflictContext.IN_GAME);
 		ClientRegistry.registerKeyBinding(ABILITY1);
 		
 		ABILITY2 = new KeyBinding("ds.keybind.ability2", GLFW.GLFW_KEY_UNKNOWN, "Dragon Survival");
+		ABILITY2.setKeyConflictContext(KeyConflictContext.IN_GAME);
 		ClientRegistry.registerKeyBinding(ABILITY2);
 		
 		ABILITY3 = new KeyBinding("ds.keybind.ability3", GLFW.GLFW_KEY_UNKNOWN, "Dragon Survival");
+		ABILITY3.setKeyConflictContext(KeyConflictContext.IN_GAME);
 		ClientRegistry.registerKeyBinding(ABILITY3);
 		
 		ABILITY4 = new KeyBinding("ds.keybind.ability4", GLFW.GLFW_KEY_UNKNOWN, "Dragon Survival");
+		ABILITY4.setKeyConflictContext(KeyConflictContext.IN_GAME);
 		ClientRegistry.registerKeyBinding(ABILITY4);
+		
+		SPIN_ABILITY = new KeyBinding("ds.keybind.spin", Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_RIGHT, "Dragon Survival");
+		SPIN_ABILITY.setKeyConflictContext(KeyConflictContext.GUI);
+		ClientRegistry.registerKeyBinding(SPIN_ABILITY);
+		
+		FREE_LOOK = new KeyBinding("ds.keybind.free_look", GLFW.GLFW_KEY_LEFT_ALT, "Dragon Survival");
+		FREE_LOOK.setKeyConflictContext(KeyConflictContext.IN_GAME);
+		ClientRegistry.registerKeyBinding(FREE_LOOK);
 	}
 	
 	@SubscribeEvent

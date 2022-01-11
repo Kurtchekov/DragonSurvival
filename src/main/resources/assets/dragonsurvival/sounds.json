@@ -63,5 +63,41 @@
     "sounds": [
       "dragonsurvival:storm_breath_end"
     ]
+  },
+   "treasure_gem_hit": {
+    "sounds": [
+      "dragonsurvival:treasure_gem_hit1",
+	  "dragonsurvival:treasure_gem_hit2",
+      "dragonsurvival:treasure_gem_hit3",
+      "dragonsurvival:treasure_gem_hit4",
+      "dragonsurvival:treasure_gem_hit5",
+      "dragonsurvival:treasure_gem_hit6"
+    ]
+  },
+    "treasure_gem_break": {
+    "sounds": [
+      "dragonsurvival:treasure_gem_break1",
+	  "dragonsurvival:treasure_gem_break2",
+      "dragonsurvival:treasure_gem_break3",
+      "dragonsurvival:treasure_gem_break4"
+    ]
+  },
+    "treasure_metal_hit": {
+    "sounds": [
+      "dragonsurvival:treasure_metal_hit1",
+	  "dragonsurvival:treasure_metal_hit2",
+      "dragonsurvival:treasure_metal_hit3",
+      "dragonsurvival:treasure_metal_hit4",
+      "dragonsurvival:treasure_metal_hit5",
+      "dragonsurvival:treasure_metal_hit6" 
+	  ]
+  },
+    "treasure_metal_break": {
+    "sounds": [
+      "dragonsurvival:treasure_metal_break1",
+	  "dragonsurvival:treasure_metal_break2",
+      "dragonsurvival:treasure_metal_break3",
+      "dragonsurvival:treasure_metal_break4"
+	  ]
   }
 }

@@ -19,7 +19,7 @@ public class SpectralImpactAbility extends PassiveDragonAbility
 	}
 	
 	public int getChance(){
-		return 15 * getLevel();
+		return ConfigHandler.SERVER.spectralImpactProcChance.get() * getLevel();
 	}
 	
 	@Override
@@ -37,7 +37,7 @@ public class SpectralImpactAbility extends PassiveDragonAbility
 	@OnlyIn( Dist.CLIENT )
 	public ArrayList<ITextComponent> getLevelUpInfo(){
 		ArrayList<ITextComponent> list = super.getLevelUpInfo();
-		list.add(new TranslationTextComponent("ds.skill.chance", "+15"));
+		list.add(new TranslationTextComponent("ds.skill.chance", "+" + ConfigHandler.SERVER.spectralImpactProcChance.get()));
 		return list;
 	}
 	

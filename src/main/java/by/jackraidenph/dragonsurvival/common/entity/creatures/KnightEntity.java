@@ -59,7 +59,6 @@ public class KnightEntity extends CreatureEntity implements IAnimatable, DragonH
                     String name = animation.animationName;
                     switch (name) {
                         case "attack":
-                            animationTimer.trackAnimation("attack");
                             if (animationTimer.getDuration("attack2") <= 0) {
                                 if (random.nextBoolean())
                                     animationTimer.putAnimation("attack", 17d, animationBuilder);
@@ -68,7 +67,6 @@ public class KnightEntity extends CreatureEntity implements IAnimatable, DragonH
                             }
                             break;
                         case "attack2":
-                            animationTimer.trackAnimation("attack2");
                             if (animationTimer.getDuration("attack") <= 0) {
                                 if (random.nextBoolean())
                                     animationTimer.putAnimation("attack", 17d, animationBuilder);
@@ -96,7 +94,6 @@ public class KnightEntity extends CreatureEntity implements IAnimatable, DragonH
                     String name = animation.animationName;
                     switch (name) {
                         case "idle":
-                            animationTimer.trackAnimation("idle");
                             if (animationTimer.getDuration("idle") <= 0) {
                                 if (random.nextInt(2000) == 0) {
                                     animationTimer.putAnimation("idle_2", 145d, animationBuilder);
@@ -108,7 +105,6 @@ public class KnightEntity extends CreatureEntity implements IAnimatable, DragonH
                             animationTimer.putAnimation("idle", 88d, animationBuilder);
                             break;
                         case "idle_2":
-                            animationTimer.trackAnimation("idle_2");
                             if (animationTimer.getDuration("idle_2") <= 0) {
                                 animationTimer.putAnimation("idle", 88d, animationBuilder);
                             }
@@ -172,9 +168,9 @@ public class KnightEntity extends CreatureEntity implements IAnimatable, DragonH
             return random.nextBoolean();
         return false;
     }
-
+ 
     @Override
     public boolean removeWhenFarAway(double distance) {
-        return tickCount >= Functions.minutesToTicks(ConfigHandler.COMMON.hunterDespawnDelay.get());
+        return !this.hasCustomName() && tickCount >= Functions.minutesToTicks(ConfigHandler.COMMON.hunterDespawnDelay.get());
     }
 }

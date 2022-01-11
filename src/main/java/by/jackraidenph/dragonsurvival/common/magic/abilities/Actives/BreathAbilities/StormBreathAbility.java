@@ -1,6 +1,8 @@
 package by.jackraidenph.dragonsurvival.common.magic.abilities.Actives.BreathAbilities;
 
 import by.jackraidenph.dragonsurvival.DragonSurvivalMod;
+import by.jackraidenph.dragonsurvival.client.particles.SeaDragon.LargeLightningParticleData;
+import by.jackraidenph.dragonsurvival.client.particles.SeaDragon.SmallLightningParticleData;
 import by.jackraidenph.dragonsurvival.client.sounds.SoundRegistry;
 import by.jackraidenph.dragonsurvival.client.sounds.StormBreathSound;
 import by.jackraidenph.dragonsurvival.common.DragonEffects;
@@ -56,7 +58,7 @@ public class StormBreathAbility extends BreathAbility
 	@Override
 	public int getManaCost()
 	{
-		return (firstUse ? ConfigHandler.SERVER.stormBreathInitialMana.get() : ConfigHandler.SERVER.stormBreathOvertimeMana.get());
+		return player != null && player.hasEffect(DragonEffects.SOURCE_OF_MAGIC) ? 0 :(firstUse ? ConfigHandler.SERVER.stormBreathInitialMana.get() : ConfigHandler.SERVER.stormBreathOvertimeMana.get());
 	}
 	
 	public void tickCost(){
@@ -144,6 +146,22 @@ public class StormBreathAbility extends BreathAbility
 			DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> (DistExecutor.SafeRunnable)() -> sound());
 		}
 		
+		if(player.level.isClientSide) {
+			for (int i = 0; i < 6; i++) {
+				double xSpeed = speed * 1f * xComp;
+				double ySpeed = speed * 1f * yComp;
+				double zSpeed = speed * 1f * zComp;
+				player.level.addParticle(new SmallLightningParticleData(37, true), dx, dy, dz, xSpeed, ySpeed, zSpeed);
+			}
+			
+			for (int i = 0; i < 2; i++) {
+				double xSpeed = speed * xComp + (spread * 0.7 * (player.level.random.nextFloat() * 2 - 1) * (Math.sqrt(1 - xComp * xComp)));
+				double ySpeed = speed * yComp + (spread * 0.7 * (player.level.random.nextFloat() * 2 - 1) * (Math.sqrt(1 - yComp * yComp)));
+				double zSpeed = speed * zComp + (spread * 0.7 * (player.level.random.nextFloat() * 2 - 1) * (Math.sqrt(1 - zComp * zComp)));
+				player.level.addParticle(new LargeLightningParticleData(37, false), dx, dy, dz, xSpeed, ySpeed, zSpeed);
+			}
+		}
+		
 		hitEntities();
 		
 		if (player.tickCount % 10 == 0) {
@@ -154,7 +172,7 @@ public class StormBreathAbility extends BreathAbility
 	@Override
 	public boolean canHitEntity(LivingEntity entity)
 	{
-		return true;
+		return !(entity instanceof PlayerEntity) || player.canHarmPlayer(((PlayerEntity)entity));
 	}
 	
 	@Override
@@ -164,7 +182,7 @@ public class StormBreathAbility extends BreathAbility
 	
 	public void onEntityHit(LivingEntity entityHit){
 		hurtTarget(entityHit);
-		StormBreathAbility.chargedEffectSparkle(player, entityHit, 6, 2, 1);
+		StormBreathAbility.chargedEffectSparkle(player, entityHit, ConfigHandler.SERVER.chargedChainRange.get(), ConfigHandler.SERVER.stormBreathChainCount.get(), ConfigHandler.SERVER.chargedEffectDamage.get());
 	}
 	
 	public static void onDamageChecks(LivingEntity entity){
@@ -193,6 +211,7 @@ public class StormBreathAbility extends BreathAbility
 				
 				if(cap != null){
 					cap.lastAfflicted = player.getId();
+					cap.chainCount = 1;
 				}
 				
 				entity.addEffect(new EffectInstance(DragonEffects.CHARGED, Functions.secondsToTicks(10), 0, false, true));
@@ -255,26 +274,33 @@ public class StormBreathAbility extends BreathAbility
 			}
 			onDamageChecks(target);
 			
-			if(target != source) {
-				if(!target.level.isClientSide) {
-					if (target.level.random.nextInt(100) < 40) {
-						GenericCapability cap = Capabilities.getGenericCapability(target).orElse(null);
-						if(cap != null){
-							cap.lastAfflicted = player != null ? player.getId() : -1;
-						}
-						target.addEffect(new EffectInstance(DragonEffects.CHARGED, Functions.secondsToTicks(10), 0, false, true));
+			if(!ConfigHandler.SERVER.chargedSpreadBlacklist.get().contains(source.getType().getRegistryName().toString())) {
+				if (target != source) {
+					GenericCapability capSource = Capabilities.getGenericCapability(source).orElse(null);
+					GenericCapability cap = Capabilities.getGenericCapability(target).orElse(null);
+					
+					if(cap != null && capSource != null){
+						cap.chainCount = capSource.chainCount + 1;
 					}
-				}
-				
-				if(player != null) {
-					if (player.level.random.nextInt(100) < 50) {
-						if (!player.level.isClientSide) {
-							player.addEffect(new EffectInstance(DragonEffects.CHARGED, Functions.secondsToTicks(30)));
+					
+					if (!target.level.isClientSide) {
+						if (target.level.random.nextInt(100) < 40) {
+							if (cap != null && (cap.chainCount < ConfigHandler.SERVER.chargedEffectMaxChain.get() || ConfigHandler.SERVER.chargedEffectMaxChain.get() == -1)) {
+								cap.lastAfflicted = player != null ? player.getId() : -1;
+								target.addEffect(new EffectInstance(DragonEffects.CHARGED, Functions.secondsToTicks(10), 0, false, true));
+							}
 						}
 					}
+					
+					if (player != null) {
+						if (player.level.random.nextInt(100) < 50) {
+							if (!player.level.isClientSide) {
+								player.addEffect(new EffectInstance(DragonEffects.CHARGED, Functions.secondsToTicks(30)));
+							}
+						}
+					}
+					spark(source, target);
 				}
-				
-				spark(source, target);
 			}
 		}
 	}

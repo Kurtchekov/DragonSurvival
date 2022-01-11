@@ -50,6 +50,84 @@ public class SettingsSideScreen extends SettingsScreen
 				super.render(p_230430_1_, p_230430_2_, p_230430_3_, p_230430_4_);
 			}
 		});
+		
+		/*
+		this.addButton(new Button(this.width / 2 - 100 + 205, 38, 20, 20, null, (p_213106_1_) -> {
+		
+		}){
+			@Override
+			public void render(MatrixStack p_230430_1_, int p_230430_2_, int p_230430_3_, float p_230430_4_)
+			{
+				this.active = Minecraft.getInstance().player.hasPermissions(2);
+				this.isHovered = p_230430_2_ >= this.x && p_230430_3_ >= this.y && p_230430_2_ < this.x + this.width && p_230430_3_ < this.y + this.height;
+				
+				Minecraft minecraft = Minecraft.getInstance();
+				minecraft.getTextureManager().bind(WIDGETS_LOCATION);
+				RenderSystem.color4f(1.0F, 1.0F, 1.0F, this.alpha);
+				int i = this.getYImage(this.isHovered());
+				RenderSystem.enableBlend();
+				RenderSystem.defaultBlendFunc();
+				RenderSystem.enableDepthTest();
+				this.blit(p_230430_1_, this.x, this.y, 0, 46 + i * 20, this.width / 2, this.height);
+				this.blit(p_230430_1_, this.x + this.width / 2, this.y, 200 - this.width / 2, 46 + i * 20, this.width / 2, this.height);
+				this.renderBg(p_230430_1_, minecraft, p_230430_2_, p_230430_3_);
+				
+				Minecraft.getInstance().getTextureManager().bind(ResetSettingsButton.texture);
+				blit(p_230430_1_, x + 2, y + 2, 0, 0, 16, 16, 16, 16);
+			}
+		});
+		
+		this.addButton(new Button(this.width / 2 - 100 + 205, 38 + 27, 20, 20, null, (p_213106_1_) -> {
+		
+		}){
+			@Override
+			public void render(MatrixStack p_230430_1_, int p_230430_2_, int p_230430_3_, float p_230430_4_)
+			{
+				this.active = Minecraft.getInstance().player.hasPermissions(2);
+				this.isHovered = p_230430_2_ >= this.x && p_230430_3_ >= this.y && p_230430_2_ < this.x + this.width && p_230430_3_ < this.y + this.height;
+				
+				Minecraft minecraft = Minecraft.getInstance();
+				minecraft.getTextureManager().bind(WIDGETS_LOCATION);
+				RenderSystem.color4f(1.0F, 1.0F, 1.0F, this.alpha);
+				int i = this.getYImage(this.isHovered());
+				RenderSystem.enableBlend();
+				RenderSystem.defaultBlendFunc();
+				RenderSystem.enableDepthTest();
+				this.blit(p_230430_1_, this.x, this.y, 0, 46 + i * 20, this.width / 2, this.height);
+				this.blit(p_230430_1_, this.x + this.width / 2, this.y, 200 - this.width / 2, 46 + i * 20, this.width / 2, this.height);
+				this.renderBg(p_230430_1_, minecraft, p_230430_2_, p_230430_3_);
+				
+				Minecraft.getInstance().getTextureManager().bind(ResetSettingsButton.texture);
+				blit(p_230430_1_, x + 2, y + 2, 0, 0, 16, 16, 16, 16);
+			}
+		});
+		
+		this.addButton(new Button(this.width / 2 - 100 + 205, 38 + 27 * 2, 20, 20, null, (p_213106_1_) -> {
+		
+		}){
+			@Override
+			public void render(MatrixStack p_230430_1_, int p_230430_2_, int p_230430_3_, float p_230430_4_)
+			{
+				this.active = Minecraft.getInstance().player.hasPermissions(2);
+				this.isHovered = p_230430_2_ >= this.x && p_230430_3_ >= this.y && p_230430_2_ < this.x + this.width && p_230430_3_ < this.y + this.height;
+				
+				Minecraft minecraft = Minecraft.getInstance();
+				minecraft.getTextureManager().bind(WIDGETS_LOCATION);
+				RenderSystem.color4f(1.0F, 1.0F, 1.0F, this.alpha);
+				int i = this.getYImage(this.isHovered());
+				RenderSystem.enableBlend();
+				RenderSystem.defaultBlendFunc();
+				RenderSystem.enableDepthTest();
+				this.blit(p_230430_1_, this.x, this.y, 0, 46 + i * 20, this.width / 2, this.height);
+				this.blit(p_230430_1_, this.x + this.width / 2, this.y, 200 - this.width / 2, 46 + i * 20, this.width / 2, this.height);
+				this.renderBg(p_230430_1_, minecraft, p_230430_2_, p_230430_3_);
+				
+				Minecraft.getInstance().getTextureManager().bind(ResetSettingsButton.texture);
+				blit(p_230430_1_, x + 2, y + 2, 0, 0, 16, 16, 16, 16);
+			}
+		});
+		 */
+		
 		this.children.add(this.list);
 		
 		this.addButton(new Button(this.width / 2 - 100, this.height - 27, 200, 20, DialogTexts.GUI_BACK, (p_213106_1_) -> {

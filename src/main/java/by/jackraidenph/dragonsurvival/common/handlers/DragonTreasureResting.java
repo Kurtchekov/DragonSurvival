@@ -8,7 +8,9 @@ import by.jackraidenph.dragonsurvival.mixins.MixinServerWorld;
 import by.jackraidenph.dragonsurvival.network.NetworkHandler;
 import by.jackraidenph.dragonsurvival.network.status.SyncTreasureRestStatus;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.MainWindow;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -18,6 +20,9 @@ import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
+import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
@@ -27,6 +32,10 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.network.PacketDistributor;
+import org.lwjgl.opengl.GL11;
+
+import java.awt.*;
+import java.util.Optional;
 
 @Mod.EventBusSubscriber
 public class DragonTreasureResting
@@ -94,13 +103,12 @@ public class DragonTreasureResting
 		
 		ServerWorld world = (ServerWorld)event.world;
 		MixinServerWorld serverWorld = (MixinServerWorld)world;
-		
-		if(world.isNight()) {
-			if (!serverWorld.getallPlayersSleeping()) {
-				if (!serverWorld.getPlayers().isEmpty()) {
-					int i = 0;
-					int j = 0;
-					
+		if (!serverWorld.getallPlayersSleeping()) {
+			if (!serverWorld.getPlayers().isEmpty()) {
+				int i = 0;
+				int j = 0;
+				
+				if(world.getGameTime() % 20 == 0) {
 					for (ServerPlayerEntity serverplayerentity : serverWorld.getPlayers()) {
 						if (serverplayerentity.isSpectator()) {
 							++i;
@@ -109,10 +117,15 @@ public class DragonTreasureResting
 						} else if (DragonStateProvider.isDragon(serverplayerentity)) {
 							DragonStateHandler handler = DragonStateProvider.getCap(serverplayerentity).orElse(null);
 							
-							if (handler != null) {
-								if (handler.treasureResting) {
-									++j;
+							if (ForgeEventFactory.fireSleepingTimeCheck(serverplayerentity, Optional.empty())) {
+								
+								if (handler != null) {
+									if (handler.treasureResting) {
+										++j;
+									}
 								}
+							}else{
+								handler.treasureSleepTimer = 0;
 							}
 						}
 					}
@@ -141,11 +154,45 @@ public class DragonTreasureResting
 					Vector3d velocity = player.getDeltaMovement();
 					float groundSpeed = MathHelper.sqrt((velocity.x * velocity.x) + (velocity.z * velocity.z));
 					if(Math.abs(groundSpeed) > 0.05){
+						handler.treasureResting = false;
 						NetworkHandler.CHANNEL.sendToServer(new SyncTreasureRestStatus(player.getId(), false));
 					}
 				}
 			}
 		}
+	}
+	
+	private static int sleepTimer = 0;
+	@OnlyIn( Dist.CLIENT)
+	@SubscribeEvent
+	public static void sleepScreenRender(RenderGameOverlayEvent.Post event) {
+		PlayerEntity playerEntity = Minecraft.getInstance().player;
+		
+		if (playerEntity == null || !DragonStateProvider.isDragon(playerEntity) || playerEntity.isSpectator())
+			return;
+		
+		DragonStateProvider.getCap(playerEntity).ifPresent(cap -> {
+			if (event.getType() == ElementType.HOTBAR) {
+				GL11.glPushMatrix();
+				MainWindow window = Minecraft.getInstance().getWindow();
+				float f = playerEntity.level.getSunAngle(1.0F);
+				
+				float f1 = f < (float)Math.PI ? 0.0F : ((float)Math.PI * 2F);
+				f = f + (f1 - f) * 0.2F;
+				double val = MathHelper.cos(f);
+				if(cap.treasureResting && val < 0.25 && sleepTimer < 100){
+					sleepTimer++;
+				}else if(sleepTimer > 0){
+					sleepTimer--;
+				}
+				if(sleepTimer > 0){
+					Color darkening = new Color(0.05f, 0.05f, 0.05f, MathHelper.lerp(Math.min(sleepTimer, 100) / 100f, 0, 0.5F));
+					AbstractGui.fill(event.getMatrixStack(), 0, 0, window.getGuiScaledWidth(), window.getGuiScaledHeight(), darkening.getRGB());
+				}
+				
+				GL11.glPopMatrix();
+			}
+		});
 	}
 	
 	@SubscribeEvent

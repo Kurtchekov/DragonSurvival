@@ -201,11 +201,15 @@ public class OptionsList extends AbstractOptionList<OptionsList.Entry>
 	}
 	
 	@Nullable
-	public CategoryEntry findCategory(String text) {
+	public CategoryEntry findCategory(String text, String lastKey) {
 		for(OptionsList.Entry optionsrowlist$row : this.children()) {
 			if(optionsrowlist$row instanceof CategoryEntry) {
-				if(((CategoryEntry)optionsrowlist$row).origName.equals(text)) {
-					return (CategoryEntry)optionsrowlist$row;
+				CategoryEntry cat = (CategoryEntry)optionsrowlist$row;
+				
+				if(cat.parent == null || cat.parent.origName.equals(lastKey)) {
+					if (cat.origName.equals(text)) {
+						return cat;
+					}
 				}
 			}
 		}

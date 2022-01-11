@@ -1,0 +1,14 @@
+{
+  "type": "crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "dragonsurvival:predator_star"
+    },
+    {
+      "item": "dragonsurvival:heart_element"
+    }
+  ],
+  "result": {
+    "item": "dragonsurvival:star_heart"
+  }
+}

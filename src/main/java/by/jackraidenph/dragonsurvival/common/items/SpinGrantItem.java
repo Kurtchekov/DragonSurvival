@@ -31,9 +31,9 @@ public class SpinGrantItem extends Item
 	{
 		DragonStateHandler handler = DragonStateProvider.getCap(player).orElse(null);
 		
-		if (handler != null && handler.isDragon() && !handler.getMovementData().spinLearned) {
+		if (handler != null && handler.isDragon()) {
 			if(!world.isClientSide) {
-				handler.getMovementData().spinLearned = true;
+				handler.getMovementData().spinLearned = !handler.getMovementData().spinLearned;
 				NetworkHandler.CHANNEL.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player), new SyncSpinStatus(player.getId(), handler.getMovementData().spinAttack, handler.getMovementData().spinCooldown, handler.getMovementData().spinLearned));
 				
 				if (!player.isCreative()) {

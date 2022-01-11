@@ -1,13 +1,14 @@
 package by.jackraidenph.dragonsurvival.common.magic.common;
 
-import by.jackraidenph.dragonsurvival.util.Functions;
+import by.jackraidenph.dragonsurvival.common.DragonEffects;
 import by.jackraidenph.dragonsurvival.common.capability.DragonStateHandler;
 import by.jackraidenph.dragonsurvival.common.capability.DragonStateProvider;
 import by.jackraidenph.dragonsurvival.config.ConfigHandler;
-import by.jackraidenph.dragonsurvival.network.NetworkHandler;
-import by.jackraidenph.dragonsurvival.server.handlers.ServerFlightHandler;
-import by.jackraidenph.dragonsurvival.network.magic.SyncAbilityCasting;
 import by.jackraidenph.dragonsurvival.misc.DragonType;
+import by.jackraidenph.dragonsurvival.network.NetworkHandler;
+import by.jackraidenph.dragonsurvival.network.magic.SyncAbilityCasting;
+import by.jackraidenph.dragonsurvival.server.handlers.ServerFlightHandler;
+import by.jackraidenph.dragonsurvival.util.Functions;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.SoundEvents;
@@ -111,7 +112,7 @@ public class ActiveDragonAbility extends DragonAbility
     }
     
     public int getManaCost() {
-        return manaCost;
+        return player != null && player.hasEffect(DragonEffects.SOURCE_OF_MAGIC) ? 0 : manaCost;
     }
     
     public boolean canConsumeMana(PlayerEntity player) {
@@ -159,7 +160,7 @@ public class ActiveDragonAbility extends DragonAbility
             return false;
         }
     
-        if(getCastingSlowness() >= 10 || ServerFlightHandler.isGliding(player)){
+        if(!canMoveWhileCasting() || ServerFlightHandler.isGliding(player)){
             if(handler.isWingsSpread() && player.isFallFlying()
                || (!player.isOnGround() && player.fallDistance > 0.15F)){
                 if(keyMode == GLFW.GLFW_PRESS) {
@@ -250,8 +251,7 @@ public class ActiveDragonAbility extends DragonAbility
         currentCooldown = nbt.getInt("cooldown");
         currentCastingTime = nbt.getInt("castTime");
     }
-    public int getCastingSlowness() { return 3; }
-    
+    public boolean canMoveWhileCasting(){ return true; }
     public AbilityAnimation getStartingAnimation(){ return null; }
     public AbilityAnimation getLoopingAnimation(){ return null; }
     public AbilityAnimation getStoppingAnimation(){ return null; }

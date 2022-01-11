@@ -145,15 +145,6 @@ public class MagicHandler
 				
 				player.addEffect(new EffectInstance(Effects.MOVEMENT_SPEED, 20, 2, false, false));
 			}
-			
-			if(!player.isCreative() && !player.level.isClientSide) {
-				ActiveDragonAbility active = cap.getMagic().getCurrentlyCasting();
-				if (active != null && active.getCastingSlowness() > 0 && (active.getCastingTime() <= 0 || active.getCurrentCastTimer() > 1)) {
-					player.addEffect(new EffectInstance(Effects.MOVEMENT_SLOWDOWN, 10, cap.getMagic().getCurrentlyCasting().getCastingSlowness(), false, false));
-					player.addEffect(new EffectInstance(Effects.JUMP, 10, -cap.getMagic().getCurrentlyCasting().getCastingSlowness(), false, false));
-					player.addEffect(new EffectInstance(Effects.SLOW_FALLING, 10, 0, false, false));
-				}
-			}
 		});
 	}
 	
@@ -205,7 +196,7 @@ public class MagicHandler
 				GenericCapability cap = Capabilities.getGenericCapability(entity).orElse(null);
 				PlayerEntity player = cap != null && cap.lastAfflicted != -1 && entity.level.getEntity(cap.lastAfflicted) instanceof PlayerEntity ? ((PlayerEntity)entity.level.getEntity(cap.lastAfflicted)) : null;
 				if (type != DragonType.SEA) {
-					StormBreathAbility.chargedEffectSparkle(player, entity, 6, 2, 1);
+					StormBreathAbility.chargedEffectSparkle(player, entity, ConfigHandler.SERVER.chargedChainRange.get(), ConfigHandler.SERVER.chargedEffectChainCount.get(), ConfigHandler.SERVER.chargedEffectDamage.get());
 				}
 			}
 		}else{
@@ -306,7 +297,7 @@ public class MagicHandler
 						
 						if (cap.getType() == DragonType.SEA) {
 							SpectralImpactAbility spectralImpact = (SpectralImpactAbility)cap.getMagic().getAbilityOrDefault(DragonAbilities.SPECTRAL_IMPACT);
-							boolean hit = player.level.random.nextInt(100) < spectralImpact.getChance();
+							boolean hit = player.level.random.nextInt(100) <= spectralImpact.getChance();
 							
 							if (hit) {
 								event.getSource().bypassArmor();
@@ -327,6 +318,8 @@ public class MagicHandler
 								if(cap1 != null){
 									cap1.lastAfflicted = player.getId();
 								}
+								
+								if(!player.level.isClientSide)
 								((LivingEntity)event.getEntity()).addEffect(new EffectInstance(DragonEffects.BURN, Functions.secondsToTicks(30)));
 							}
 						}

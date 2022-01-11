@@ -166,7 +166,7 @@ public class ToolTipHandler
 		
 		RenderSystem.enableBlend();
 		
-		matrix.translate(0, 0, 410.0);
+		matrix.translate(0, 0, 610.0);
 		
 		AbstractGui.blit(matrix, x - 8 - 6, y - 8 - 6, 1, 1 % texHeight, 16, 16, texWidth, texHeight);
 		AbstractGui.blit(matrix, x + width - 8 + 6, y - 8 - 6, texWidth - 16 - 1, 1 % texHeight, 16, 16, texWidth, texHeight);

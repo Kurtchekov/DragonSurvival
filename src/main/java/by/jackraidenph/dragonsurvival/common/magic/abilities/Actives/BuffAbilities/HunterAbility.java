@@ -67,8 +67,7 @@ public class HunterAbility extends ActiveDragonAbility
 		return new AbilityAnimation("self_buff", 0.52 * 20, true, false);
 	}
 	
-	public int getCastingSlowness() { return 10; }
-	
+	public boolean canMoveWhileCasting(){ return false; }
 	@Override
 	public ArrayList<ITextComponent> getInfo()
 	{

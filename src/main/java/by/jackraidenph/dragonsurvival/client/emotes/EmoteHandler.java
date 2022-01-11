@@ -1,7 +1,7 @@
-package by.jackraidenph.dragonsurvival.client.handlers;
+package by.jackraidenph.dragonsurvival.client.emotes;
 
 import by.jackraidenph.dragonsurvival.common.capability.DragonStateProvider;
-import by.jackraidenph.dragonsurvival.client.emotes.Emote;
+import by.jackraidenph.dragonsurvival.config.ConfigHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.PointOfView;
 import net.minecraft.entity.LivingEntity;
@@ -82,20 +82,24 @@ public class EmoteHandler
 						}
 					}
 					
-					if(emote.animation != null && !emote.animation.isEmpty()) {
+					if(ConfigHandler.SERVER.canMoveInEmote.get()) {
+						if (emote.animation != null && !emote.animation.isEmpty()) {
+							ModifiableAttributeInstance attributeInstance = player.getAttribute(Attributes.MOVEMENT_SPEED);
+							AttributeModifier noMove = new AttributeModifier(EMOTE_NO_MOVE, "EMOTE", -attributeInstance.getValue(), AttributeModifier.Operation.ADDITION);
+							
+							if (!attributeInstance.hasModifier(noMove)) {
+								attributeInstance.addTransientModifier(noMove);
+							}
+						}
+					}
+				}else {
+					if (ConfigHandler.SERVER.canMoveInEmote.get()) {
 						ModifiableAttributeInstance attributeInstance = player.getAttribute(Attributes.MOVEMENT_SPEED);
 						AttributeModifier noMove = new AttributeModifier(EMOTE_NO_MOVE, "EMOTE", -attributeInstance.getValue(), AttributeModifier.Operation.ADDITION);
 						
-						if (!attributeInstance.hasModifier(noMove)) {
-							attributeInstance.addTransientModifier(noMove);
+						if (attributeInstance.hasModifier(noMove)) {
+							attributeInstance.removeModifier(EMOTE_NO_MOVE);
 						}
-					}
-				}else{
-					ModifiableAttributeInstance attributeInstance = player.getAttribute(Attributes.MOVEMENT_SPEED);
-					AttributeModifier noMove = new AttributeModifier(EMOTE_NO_MOVE, "EMOTE", -attributeInstance.getValue(), AttributeModifier.Operation.ADDITION);
-					
-					if (attributeInstance.hasModifier(noMove)) {
-						attributeInstance.removeModifier(EMOTE_NO_MOVE);
 					}
 				}
 			});

@@ -36,8 +36,8 @@ public abstract class MixinInventoryScreen extends DisplayEffectsScreen<PlayerCo
                 double lastHeadPitch = dragonStateHandler.getMovementData().headPitchLastTick;
                 
                 dragonStateHandler.getMovementData().bodyYaw = player.yBodyRot;
-                dragonStateHandler.getMovementData().headYaw = player.yHeadRot;
-                dragonStateHandler.getMovementData().headPitch = player.xRot;
+                dragonStateHandler.getMovementData().headYaw = 0;
+                dragonStateHandler.getMovementData().headPitch = 0;
                 
                 dragonStateHandler.getMovementData().bodyYawLastTick = player.yBodyRot;
                 dragonStateHandler.getMovementData().headYawLastTick = player.yHeadRot;

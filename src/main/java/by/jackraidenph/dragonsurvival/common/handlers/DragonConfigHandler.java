@@ -18,17 +18,23 @@ import java.util.Map;
 @Mod.EventBusSubscriber(modid = DragonSurvivalMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class DragonConfigHandler
 {
-	public static Map<DragonType, List<Block>> DRAGON_SPEEDUP_BLOCKS;
 	public static List<Block> SEA_DRAGON_HYDRATION_BLOCKS;
 	public static List<Item> SEA_DRAGON_HYDRATION_USE_ALTERNATIVES;
+	
+	public static List<Block> FOREST_DRAGON_BREATH_GROW_BLACKLIST;
+	
+	public static Map<DragonType, List<Block>> DRAGON_SPEEDUP_BLOCKS;
 	public static Map<DragonType, List<Block>> DRAGON_BREATH_BLOCKS;
+	public static Map<DragonType, List<Block>> DRAGON_MANA_BLOCKS;
 	
 	@SubscribeEvent
 	public static void onConfigLoad(ModConfig.Loading event) {
 		if (event.getConfig().getType() == Type.SERVER) {
 			rebuildSpeedupBlocksMap();
-			rebuildSeaHydrationLists();
+			rebuildSeaDragonConfigs();
 			rebuildBreathBlocks();
+			rebuildManaBlocks();
+			rebuildForestDragonConfigs();
 		}
 	}
 	
@@ -48,8 +54,20 @@ public class DragonConfigHandler
 		DRAGON_BREATH_BLOCKS = breathMap;
 	}
 	
-	private static void rebuildSeaHydrationLists() {
+	public static void rebuildManaBlocks() {
+		HashMap<DragonType, List<Block>> map = new HashMap<>();
+		map.put(DragonType.CAVE, ConfigUtils.parseConfigBlockList(ConfigHandler.SERVER.caveDragonManaBlocks.get()));
+		map.put(DragonType.FOREST, ConfigUtils.parseConfigBlockList(ConfigHandler.SERVER.forestDragonManaBlocks.get()));
+		map.put(DragonType.SEA, ConfigUtils.parseConfigBlockList(ConfigHandler.SERVER.seaDragonManaBlocks.get()));
+		DRAGON_MANA_BLOCKS = map;
+	}
+	
+	private static void rebuildSeaDragonConfigs() {
 		SEA_DRAGON_HYDRATION_BLOCKS = ConfigUtils.parseConfigBlockList(ConfigHandler.SERVER.seaHydrationBlocks.get());
 		SEA_DRAGON_HYDRATION_USE_ALTERNATIVES = ConfigUtils.parseConfigItemList(ConfigHandler.SERVER.seaAdditionalWaterUseables.get());
+	}
+	
+	private static void rebuildForestDragonConfigs() {
+		FOREST_DRAGON_BREATH_GROW_BLACKLIST = ConfigUtils.parseConfigBlockList(ConfigHandler.SERVER.forestBreathGrowBlacklist.get());
 	}
 }

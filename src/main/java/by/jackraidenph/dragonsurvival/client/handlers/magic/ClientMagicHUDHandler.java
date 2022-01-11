@@ -40,7 +40,6 @@ public class ClientMagicHUDHandler
 		if(!ConfigHandler.SERVER.consumeEXPAsMana.get()) return;
 		
 		if(event.getType() == ElementType.EXPERIENCE){
-			
 			DragonStateProvider.getCap(playerEntity).ifPresent(cap -> {
 				ActiveDragonAbility ability = cap.getMagic().getAbilityFromSlot(cap.getMagic().getSelectedAbilitySlot());
 				if(ability == null) return;

@@ -6,6 +6,7 @@ import by.jackraidenph.dragonsurvival.common.capability.DragonStateProvider;
 import by.jackraidenph.dragonsurvival.network.NetworkHandler;
 import by.jackraidenph.dragonsurvival.network.status.SyncTreasureRestStatus;
 import net.minecraft.block.*;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -15,11 +16,13 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.item.ItemStack;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
+import net.minecraft.stats.Stats;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
@@ -29,6 +32,8 @@ import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
@@ -39,6 +44,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.awt.*;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
@@ -57,7 +63,14 @@ public class TreasureBlock extends FallingBlock implements IWaterLoggable
 		this.registerDefaultState(this.stateDefinition.any().setValue(LAYERS, Integer.valueOf(1)).setValue(WATERLOGGED, false));
 		this.effectColor = c;
 	}
-	
+	@Override
+	public void appendHoverText(ItemStack p_190948_1_,
+			@Nullable
+					IBlockReader p_190948_2_, List<ITextComponent> p_190948_3_, ITooltipFlag p_190948_4_)
+	{
+		super.appendHoverText(p_190948_1_, p_190948_2_, p_190948_3_, p_190948_4_);
+		p_190948_3_.add(new TranslationTextComponent("ds.description.treasures"));
+	}
 	
 	@Override
 	public boolean isBed(BlockState state, IBlockReader world, BlockPos pos, @Nullable Entity player)
@@ -155,10 +168,6 @@ public class TreasureBlock extends FallingBlock implements IWaterLoggable
 		return SHAPE_BY_LAYER[p_230335_1_.getValue(LAYERS)];
 	}
 	
-//	public VoxelShape getVisualShape(BlockState p_230322_1_, IBlockReader p_230322_2_, BlockPos p_230322_3_, ISelectionContext p_230322_4_) {
-//		return SHAPE_BY_LAYER[p_230322_1_.getValue(LAYERS)];
-//	}
-	
 	public VoxelShape getVisualShape(BlockState p_230322_1_, IBlockReader p_230322_2_, BlockPos p_230322_3_, ISelectionContext p_230322_4_) {
 		return VoxelShapes.empty();
 	}
@@ -193,8 +202,11 @@ public class TreasureBlock extends FallingBlock implements IWaterLoggable
 					}
 					
 					if(!world.isClientSide) {
+						player.resetStat(Stats.CUSTOM.get(Stats.TIME_SINCE_REST));
 						ServerPlayerEntity serverplayerentity = (ServerPlayerEntity)player;
-						if (serverplayerentity.getRespawnPosition() == null || serverplayerentity.getRespawnDimension() != world.dimension() || serverplayerentity.getRespawnPosition() != null && !serverplayerentity.getRespawnPosition().equals(p_225533_3_)) {
+						if (serverplayerentity.getRespawnPosition() == null
+						    || serverplayerentity.getRespawnDimension() != world.dimension()
+						    || serverplayerentity.getRespawnPosition() != null && !serverplayerentity.getRespawnPosition().equals(p_225533_3_) && serverplayerentity.getRespawnPosition().distSqr(p_225533_3_) > 40) {
 							serverplayerentity.setRespawnPosition(world.dimension(), p_225533_3_, 0.0F, false, true);
 							return ActionResultType.SUCCESS;
 						}

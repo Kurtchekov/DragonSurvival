@@ -31,10 +31,10 @@ public class WingGrantItem extends Item
 	{
 		DragonStateHandler handler = DragonStateProvider.getCap(player).orElse(null);
 		
-		if (handler != null && handler.isDragon() && !handler.hasWings()) {
+		if (handler != null && handler.isDragon()) {
 			if(!world.isClientSide) {
-				handler.setHasWings(true);
-				NetworkHandler.CHANNEL.send(PacketDistributor.ALL.noArg(), new SynchronizeDragonCap(player.getId(), handler.isHiding(), handler.getType(), handler.getSize(), true, handler.getLavaAirSupply(), handler.getPassengerId()));
+				handler.setHasWings(!handler.hasWings());
+				NetworkHandler.CHANNEL.send(PacketDistributor.ALL.noArg(), new SynchronizeDragonCap(player.getId(), handler.isHiding(), handler.getType(), handler.getSize(), handler.hasWings(), handler.getLavaAirSupply(), handler.getPassengerId()));
 				
 				if (!player.isCreative()) {
 					player.getItemInHand(p_77659_3_).shrink(1);

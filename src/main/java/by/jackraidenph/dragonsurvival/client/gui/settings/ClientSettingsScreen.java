@@ -25,9 +25,7 @@ import net.minecraft.client.settings.BooleanOption;
 import net.minecraft.client.settings.IteratableOption;
 import net.minecraft.client.settings.SliderPercentageOption;
 import net.minecraft.util.IReorderingProcessor;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.util.text.*;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.*;
 
@@ -89,11 +87,12 @@ public class ClientSettingsScreen extends SettingsScreen
 				String key = ent.getKey();
 				String lastKey = key;
 				for (String s : key.split("\\.")) {
-					if(this.list.findCategory(s) == null
-					   || (this.list.findCategory(s).parent != null && !this.list.findCategory(s).parent.origName.equals(lastKey))) {
+					if(this.list.findCategory(s, lastKey) == null
+					   || (this.list.findCategory(s, lastKey).parent != null && !this.list.findCategory(s, lastKey).parent.origName.equals(lastKey))) {
 						entry = this.list.addCategory(s, entry);
+
 					}else{
-						entry = this.list.findCategory(s);
+						entry = this.list.findCategory(s, lastKey);
 					}
 					lastKey = s;
 				}
@@ -134,8 +133,8 @@ public class ClientSettingsScreen extends SettingsScreen
 			ValueSpec spec = (ValueSpec)value;
 			Object ob = getSpec().getValues().get(getConfigName() + "." + key);
 			
-			StringTextComponent tooltip = new StringTextComponent("§l" + origPath + "§r\n\n" + (spec.getComment() != null ? spec.getComment() : ""));
-			
+			IFormattableTextComponent tooltip = spec.getTranslationKey() == null ? new StringTextComponent("§l" + origPath + "§r\n\n" + (spec.getComment() != null ? spec.getComment() : ""))
+					: new StringTextComponent("§l" + origPath + "§r\n\n").append(new TranslationTextComponent(spec.getTranslationKey()));
 			if(spec.needsWorldRestart()){
 				tooltip.append("\n§4This setting requires a server restart!§r");
 			}

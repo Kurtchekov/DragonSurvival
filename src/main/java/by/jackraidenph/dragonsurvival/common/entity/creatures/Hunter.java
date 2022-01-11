@@ -47,7 +47,7 @@ public abstract class Hunter extends CreatureEntity implements DragonHunter {
 
     @Override
     public boolean removeWhenFarAway(double distance) {
-        return tickCount >= Functions.minutesToTicks(ConfigHandler.COMMON.hunterDespawnDelay.get());
+        return !this.hasCustomName() && tickCount >= Functions.minutesToTicks(ConfigHandler.COMMON.hunterDespawnDelay.get());
     }
 
     public AbstractIllagerEntity.ArmPose getArmPose() {

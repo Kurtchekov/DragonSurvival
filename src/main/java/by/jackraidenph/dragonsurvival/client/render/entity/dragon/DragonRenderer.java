@@ -4,6 +4,7 @@ import by.jackraidenph.dragonsurvival.client.render.ClientDragonRender;
 import by.jackraidenph.dragonsurvival.common.capability.DragonStateHandler;
 import by.jackraidenph.dragonsurvival.common.capability.DragonStateProvider;
 import by.jackraidenph.dragonsurvival.common.entity.DragonEntity;
+import by.jackraidenph.dragonsurvival.common.magic.DragonAbilities;
 import by.jackraidenph.dragonsurvival.common.magic.abilities.Actives.BreathAbilities.BreathAbility;
 import by.jackraidenph.dragonsurvival.config.ConfigHandler;
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -92,29 +93,38 @@ public class DragonRenderer extends GeoEntityRenderer<DragonEntity> {
 		PlayerEntity player = currentEntity != null ? currentEntity.getPlayer() : null;
 		
 		if(!isLayer && player != null) {
-			/*if (bone.getName().equals("RightItem") && !mainHand.isEmpty()) {
+			/*if (bone.getName().equals(ConfigHandler.CLIENT.renderItemsInMouth.get() ? "RightItem_jaw" : "RightItem") && !mainHand.isEmpty()) {
 				if(player != Minecraft.getInstance().player || ConfigHandler.CLIENT.alternateHeldItem.get() || !Minecraft.getInstance().options.getCameraType().isFirstPerson()) {
 					stack.pushPose();
+					GeoCube ch = bone.childCubes != null && bone.childCubes.size() > 0 ? bone.childCubes.get(0) : null;
 					RenderUtils.translate(bone, stack);
 					RenderUtils.moveToPivot(bone, stack);
 					RenderUtils.rotate(bone, stack);
 					RenderUtils.scale(bone, stack);
 					stack.mulPose(Vector3f.ZP.rotationDegrees(0));
 					stack.translate(0.0, 0, 0.0);
-					Minecraft.getInstance().getItemRenderer().renderStatic(mainHand, TransformType.THIRD_PERSON_RIGHT_HAND, packedLightIn, packedOverlayIn, stack, rtb);
+					if(ch != null){
+						stack.scale(ch.size.x(), ch.size.y(), ch.size.z());
+					}
+					Minecraft.getInstance().getItemRenderer().renderStatic(currentEntity.getPlayer().inventory.getSelected(), ConfigHandler.CLIENT.thirdPersonItemRender.get() ? TransformType.THIRD_PERSON_RIGHT_HAND : TransformType.GROUND, packedLightIn, packedOverlayIn, stack, rtb);
 					stack.popPose();
 					bufferIn = rtb.getBuffer(RenderType.entityCutout(whTexture));
 				}
-			}else if (bone.getName().equals("LeftItem") && !offHand.isEmpty()) {
+			}else if (bone.getName().equals(ConfigHandler.CLIENT.renderItemsInMouth.get() ? "LeftItem_jaw" : "LeftItem") && !offHand.isEmpty()) {
 				if(player != Minecraft.getInstance().player || ConfigHandler.CLIENT.alternateHeldItem.get() || !Minecraft.getInstance().options.getCameraType().isFirstPerson()) {
 					stack.pushPose();
 					RenderUtils.translate(bone, stack);
 					RenderUtils.moveToPivot(bone, stack);
 					RenderUtils.rotate(bone, stack);
 					RenderUtils.scale(bone, stack);
+					GeoCube ch = bone.childCubes != null && bone.childCubes.size() > 0 ? bone.childCubes.get(0) : null;
+					
 					stack.mulPose(Vector3f.ZP.rotationDegrees(0));
 					stack.translate(0.0, 0, 0.0);
-					Minecraft.getInstance().getItemRenderer().renderStatic(offHand, TransformType.THIRD_PERSON_LEFT_HAND, packedLightIn, packedOverlayIn, stack, rtb);
+					if(ch != null){
+						stack.scale(ch.size.x(), ch.size.y(), ch.size.z());
+					}
+					Minecraft.getInstance().getItemRenderer().renderStatic(currentEntity.getPlayer().inventory.offhand.get(0), ConfigHandler.CLIENT.thirdPersonItemRender.get() ? TransformType.THIRD_PERSON_RIGHT_HAND : TransformType.GROUND, packedLightIn, packedOverlayIn, stack, rtb);
 					stack.popPose();
 					bufferIn = rtb.getBuffer(RenderType.entityCutout(whTexture));
 				}
@@ -123,19 +133,23 @@ public class DragonRenderer extends GeoEntityRenderer<DragonEntity> {
 				
 				if(handler != null){
 					if(handler.getMagic().getCurrentlyCasting() instanceof BreathAbility){
-						if(((BreathAbility)handler.getMagic().getCurrentlyCasting()).getEffectEntity() != null) {
-							stack.pushPose();
-							RenderUtils.translate(bone, stack);
-							RenderUtils.moveToPivot(bone, stack);
-							RenderUtils.rotate(bone, stack);
-							RenderUtils.scale(bone, stack);
-							stack.mulPose(Vector3f.YN.rotationDegrees(-90));
-							//stack.mulPose(Vector3f.ZN.rotationDegrees(player.xRot));//For head pitch
-							EntityRenderer<? super Entity> effectRender = Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(((BreathAbility)handler.getMagic().getCurrentlyCasting()).getEffectEntity());
-							effectRender.render(((BreathAbility)handler.getMagic().getCurrentlyCasting()).getEffectEntity(), player.getViewYRot(partialTicks), partialTicks, stack, rtb, 200);
-							bufferIn = rtb.getBuffer(RenderType.entityCutout(whTexture));
-							
-							stack.popPose();
+						BreathAbility ability = (BreathAbility)handler.getMagic().getCurrentlyCasting();
+						int slot = DragonAbilities.getAbilitySlot(ability);
+						if(ability.getCurrentCastTimer() >= ability.getCastingTime() || handler.getMagic().getAbilityFromSlot(slot).getCurrentCastTimer() >= ability.getCastingTime()) {
+							if (ability.getEffectEntity() != null) {
+								stack.pushPose();
+								RenderUtils.translate(bone, stack);
+								RenderUtils.moveToPivot(bone, stack);
+								RenderUtils.rotate(bone, stack);
+								RenderUtils.scale(bone, stack);
+								stack.mulPose(Vector3f.YN.rotationDegrees(-90));
+								//stack.mulPose(Vector3f.ZN.rotationDegrees(player.xRot));//For head pitch
+								EntityRenderer<? super Entity> effectRender = Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(ability.getEffectEntity());
+								effectRender.render(ability.getEffectEntity(), player.getViewYRot(partialTicks), partialTicks, stack, rtb, 200);
+								bufferIn = rtb.getBuffer(RenderType.entityCutout(whTexture));
+								
+								stack.popPose();
+							}
 						}
 					}
 				}

@@ -10,11 +10,11 @@
       "item": "dragonsurvival:elder_dragon_dust"
     },
     "S": {
-      "tag": "dragonsurvival:cooked_mushrooms"
+      "item": "minecraft:salmon"
     }
   },
   "result": {
-    "item": "dragonsurvival:cave_dragon_treat",
+    "item": "dragonsurvival:sea_dragon_treat",
     "count": 1
   }
 }
