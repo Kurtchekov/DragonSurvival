@@ -272,7 +272,7 @@ public class ClientFlightHandler {
                             float f3 = MathHelper.cos(f6);
                             f3 = (float) ((double) f3 * (double) f3 * Math.min(1.0D, d12 / 0.4D));
                             ModifiableAttributeInstance gravity = playerEntity.getAttribute(net.minecraftforge.common.ForgeMod.ENTITY_GRAVITY.get());
-                            double g = gravity.getValue();
+                            double g = gravity.getValue() * ConfigHandler.SERVER.gravityFactor.get();
                             
                             if(ServerFlightHandler.isGliding(playerEntity)){
                                 if(!wasGliding){
@@ -389,7 +389,7 @@ public class ClientFlightHandler {
                                 ay *= 0.9F;
                                 az *= 0.9F;
     
-                                if(movement.jumping){
+                                /*if(movement.jumping){
                                     motion = new Vector3d(motion.x, 0.4 + motion.y, motion.z);
         
                                     if(motion.length() != playerEntity.getDeltaMovement().length()){
@@ -398,7 +398,7 @@ public class ClientFlightHandler {
         
                                     playerEntity.setDeltaMovement(motion);
                                     return;
-                                }else if(movement.shiftKeyDown){
+                                }else*/ if(movement.shiftKeyDown){
                                     motion = new Vector3d(motion.x, -0.5 + motion.y, motion.z);
                                     if(motion.length() != playerEntity.getDeltaMovement().length()){
                                         NetworkHandler.CHANNEL.sendToServer(new SyncFlightSpeed(playerEntity.getId(), motion));

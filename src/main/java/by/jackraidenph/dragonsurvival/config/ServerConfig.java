@@ -12,6 +12,7 @@ import java.util.List;
 public class ServerConfig {
 
 	public final ForgeConfigSpec.DoubleValue maxFlightSpeed;
+	public final ForgeConfigSpec.DoubleValue gravityFactor;
 	public final ForgeConfigSpec.BooleanValue mineStarBlock;
     public final ForgeConfigSpec.BooleanValue sizeChangesHitbox;
     public final ForgeConfigSpec.BooleanValue hitboxGrowsPastHuman;
@@ -363,7 +364,10 @@ public class ServerConfig {
 		builder.pop().push("wings");
 		maxFlightSpeed = builder
 				.comment("Maximum acceleration fly speed up and down. Take into account the chunk load speed. A speed of 0.3 is optimal.")
-				.defineInRange("maxFlightSpeed", 0.3, 0.1, 1);
+				.defineInRange("maxFlightSpeed", 0.3, 0.0001, 1);
+		gravityFactor = builder
+				.comment("Gravity gets multiplied by this value when flying.")
+				.defineInRange("gravityFactor", 0.3, 0.0001, 1);
 		startWithWings = builder
 				.comment("Whether dragons born with wings.")
 				.define("startWithWings", true);

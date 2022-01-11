@@ -35,6 +35,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.IDyeableArmorItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
@@ -68,13 +69,20 @@ public class ClientDragonRender
 	public static void renderFirstPerson(RenderHandEvent renderHandEvent) {
 		if (ConfigHandler.CLIENT.renderInFirstPerson.get()) {
 			ClientPlayerEntity player = Minecraft.getInstance().player;
-			DragonStateProvider.getCap(player).ifPresent(playerStateHandler -> {
-				if (playerStateHandler.isDragon()) {
-					if(ConfigHandler.CLIENT.alternateHeldItem.get()){
-						renderHandEvent.setCanceled(true);
+			if(ConfigHandler.CLIENT.alternateHeldItem.get()){
+				if (player != null) {
+					ResourceLocation held = player.getItemInHand(Hand.MAIN_HAND).getItem().getRegistryName();
+					if (held != null) {
+						if (held.toString().equals("minecraft:filled_map")) return;
 					}
 				}
-			});
+
+				DragonStateProvider.getCap(player).ifPresent(playerStateHandler -> {
+				if (playerStateHandler.isDragon()) {
+						renderHandEvent.setCanceled(true);
+					}
+				});
+			}
 		}
 	}
 	
